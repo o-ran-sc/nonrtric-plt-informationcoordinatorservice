@@ -29,7 +29,7 @@
         <version>2.6.6</version>
         <relativePath />
     </parent>
-    <groupId>org.o-ran-sc.nonrtric</groupId>
+    <groupId>org.o-ran-sc.nonrtric-plt-informationcoordinatorservice</groupId>
     <artifactId>nonrtric-plt-informationcoordinatorservice</artifactId>
     <version>1.3.0-SNAPSHOT</version>
     <licenses>
