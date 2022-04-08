@@ -29,8 +29,8 @@
         <version>2.6.6</version>
         <relativePath />
     </parent>
-    <groupId>org.o-ran-sc.nonrtric</groupId>
-    <artifactId>nonrtric-plt-informationcoordinatorservice</artifactId>
+    <groupId>org.o-ran-sc.plt</groupId>
+    <artifactId>informationcoordinatorservice</artifactId>
     <version>1.3.0-SNAPSHOT</version>
     <licenses>
         <license>
