@@ -16,6 +16,23 @@
       "message": "Decision to change groupId to \"o-ran-sc.nonrtric.plt\" and artifactId to \"informationcoordinatorservice\".",
       "revId": "75450707ec3b7c2a284044bc46d497470f1060f4",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "461c458d_bb333dce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-04-21T06:21:13Z",
+      "side": 1,
+      "message": "stage-release",
+      "revId": "75450707ec3b7c2a284044bc46d497470f1060f4",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
