@@ -24,6 +24,54 @@
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "651033aa_f923edc6",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50600aa5_7873d741",
+      "range": {
+        "startLine": 22,
+        "startChar": 54,
+        "endLine": 22,
+        "endChar": 69
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8368e3f5_f4e2b047",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "Done. Lower case should be fine.",
+      "parentUuid": "50600aa5_7873d741",
+      "range": {
+        "startLine": 22,
+        "startChar": 54,
+        "endLine": 22,
+        "endChar": 69
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e74d697d_2cb7a647",
@@ -49,6 +97,78 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "616439c8_f9ead705",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "e74d697d_2cb7a647",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 25
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "415dc12e_a30ffe33",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "e74d697d_2cb7a647",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 25
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5f6a919_5dd759f6",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "e74d697d_2cb7a647",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 25
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d27e36f0_ae5224b7",
         "filename": "docs/overview.rst",
         "patchSetId": 3
@@ -60,6 +180,30 @@
       "writtenOn": "2022-04-22T15:27:45Z",
       "side": 1,
       "message": "no need to mention vendors here I guess ... ?",
+      "range": {
+        "startLine": 32,
+        "startChar": 76,
+        "endLine": 32,
+        "endChar": 88
+      },
+      "revId": "c565f493438fd6ec693386534723b15a92c2555e",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cc41844_a261a350",
+        "filename": "docs/overview.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2022-04-25T06:44:29Z",
+      "side": 1,
+      "message": "One of the key priciples is that the producers and consumers may be from different vendors.",
+      "parentUuid": "d27e36f0_ae5224b7",
       "range": {
         "startLine": 32,
         "startChar": 76,
