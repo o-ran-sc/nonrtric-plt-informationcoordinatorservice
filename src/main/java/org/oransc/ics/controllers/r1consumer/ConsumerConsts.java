@@ -44,10 +44,6 @@ public class ConsumerConsts {
 
     public static final String SUBSCRIPTION_ID_PATH = "subscriptionId";
 
-    public static final String PERFORM_TYPE_CHECK_PARAM = "typeCheck";
-    public static final String PERFORM_TYPE_CHECK_PARAM_DESCRIPTION =
-        "when true, a validation of that the type exists and that the job matches the type schema.";
-
     public static final String INDIVIDUAL_TYPE_SUBSCRIPTION =
         "Individual subscription for information types (registration/deregistration)";
 

@@ -293,19 +293,11 @@ public class ConsumerController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class)))})
     public Mono<ResponseEntity<Object>> putIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId, //
-        @Parameter(
-            name = ConsumerConsts.PERFORM_TYPE_CHECK_PARAM,
-            required = false, //
-            description = ConsumerConsts.PERFORM_TYPE_CHECK_PARAM_DESCRIPTION) //
-        @RequestParam(
-            name = ConsumerConsts.PERFORM_TYPE_CHECK_PARAM,
-            required = false,
-            defaultValue = "false") boolean performTypeCheck,
         @RequestBody ConsumerJobInfo informationJobObject) {
 
         final boolean isNewJob = this.infoJobs.get(jobId) == null;
 
-        return validatePutInfoJob(jobId, informationJobObject, performTypeCheck) //
+        return validatePutInfoJob(jobId, informationJobObject) //
             .flatMap(this::startInfoSubscriptionJob) //
             .doOnNext(this.infoJobs::put) //
             .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
@@ -444,12 +436,12 @@ public class ConsumerController {
             .map(noOfAcceptingProducers -> newInfoJob);
     }
 
-    private Mono<InfoJob> validatePutInfoJob(String jobId, ConsumerJobInfo jobInfo, boolean performTypeCheck) {
+    private Mono<InfoJob> validatePutInfoJob(String jobId, ConsumerJobInfo jobInfo) {
         try {
-            if (performTypeCheck) {
-                InfoType infoType = this.infoTypes.getType(jobInfo.infoTypeId);
-                validateJsonObjectAgainstSchema(infoType.getJobDataSchema(), jobInfo.jobDefinition);
-            }
+
+            InfoType infoType = this.infoTypes.getType(jobInfo.infoTypeId);
+            validateJsonObjectAgainstSchema(infoType.getJobDataSchema(), jobInfo.jobDefinition);
+
             InfoJob existingEiJob = this.infoJobs.get(jobId);
             validateUri(jobInfo.statusNotificationUri);
             validateUri(jobInfo.jobResultUri);
@@ -473,20 +465,18 @@ public class ConsumerController {
     }
 
     private void validateJsonObjectAgainstSchema(Object schemaObj, Object object) throws ServiceException {
-        if (schemaObj != null) { // schema is optional for now
-            try {
-                ObjectMapper mapper = new ObjectMapper();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
 
-                String schemaAsString = mapper.writeValueAsString(schemaObj);
-                JSONObject schemaJSON = new JSONObject(schemaAsString);
-                var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
+            String schemaAsString = mapper.writeValueAsString(schemaObj);
+            JSONObject schemaJSON = new JSONObject(schemaAsString);
+            var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
 
-                String objectAsString = mapper.writeValueAsString(object);
-                JSONObject json = new JSONObject(objectAsString);
-                schema.validate(json);
-            } catch (Exception e) {
-                throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
-            }
+            String objectAsString = mapper.writeValueAsString(object);
+            JSONObject json = new JSONObject(objectAsString);
+            schema.validate(json);
+        } catch (Exception e) {
+            throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
