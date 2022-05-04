@@ -1099,24 +1099,12 @@
                         "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProblemDetails"}}}
                     }
                 },
-                "parameters": [
-                    {
-                        "schema": {"type": "string"},
-                        "in": "path",
-                        "name": "infoJobId",
-                        "required": true
-                    },
-                    {
-                        "schema": {
-                            "default": false,
-                            "type": "boolean"
-                        },
-                        "in": "query",
-                        "name": "typeCheck",
-                        "description": "when true, a validation of that the type exists and that the job matches the type schema.",
-                        "required": false
-                    }
-                ],
+                "parameters": [{
+                    "schema": {"type": "string"},
+                    "in": "path",
+                    "name": "infoJobId",
+                    "required": true
+                }],
                 "tags": ["Data consumer"]
             }
         },

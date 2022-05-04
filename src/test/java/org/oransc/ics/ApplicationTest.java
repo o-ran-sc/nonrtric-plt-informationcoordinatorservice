@@ -481,20 +481,6 @@ class ApplicationTest {
     }
 
     @Test
-    void consumerPutInformationJob_noType() throws JsonMappingException, JsonProcessingException, ServiceException {
-        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId?typeCheck=false";
-        String body = gson.toJson(consumerJobInfo());
-        ResponseEntity<String> resp = restClient().putForEntity(url, body).block();
-        assertThat(this.infoJobs.size()).isEqualTo(1);
-        assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        verifyJobStatus(EI_JOB_ID, "DISABLED");
-
-        putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
-
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
-    }
-
-    @Test
     void a1ePutEiJob_jsonSchemavalidationError() throws Exception {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
 
@@ -514,7 +500,7 @@ class ApplicationTest {
     void consumerPutJob_jsonSchemavalidationError() throws Exception {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
 
-        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId?typeCheck=true";
+        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
         // The element with name "property1" is mandatory in the schema
         ConsumerJobInfo jobInfo =
             new ConsumerJobInfo("typeId", jsonObject("{ \"XXstring\" : \"value\" }"), "owner", "targetUri", null);
@@ -527,7 +513,7 @@ class ApplicationTest {
     void consumerPutJob_uriError() throws Exception {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
 
-        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId?typeCheck=true";
+        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
 
         ConsumerJobInfo jobInfo = new ConsumerJobInfo(TYPE_ID, jsonObject(), "owner", "junk", null);
         String body = gson.toJson(jobInfo);

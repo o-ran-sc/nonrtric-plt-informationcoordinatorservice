@@ -336,20 +336,18 @@ public class A1eController {
     }
 
     private void validateJsonObjectAgainstSchema(Object schemaObj, Object object) throws ServiceException {
-        if (schemaObj != null) { // schema is optional for now
-            try {
-                ObjectMapper mapper = new ObjectMapper();
+        try {
+            ObjectMapper mapper = new ObjectMapper();
 
-                String schemaAsString = mapper.writeValueAsString(schemaObj);
-                JSONObject schemaJSON = new JSONObject(schemaAsString);
-                var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
+            String schemaAsString = mapper.writeValueAsString(schemaObj);
+            JSONObject schemaJSON = new JSONObject(schemaAsString);
+            var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
 
-                String objectAsString = mapper.writeValueAsString(object);
-                JSONObject json = new JSONObject(objectAsString);
-                schema.validate(json);
-            } catch (Exception e) {
-                throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
-            }
+            String objectAsString = mapper.writeValueAsString(object);
+            JSONObject json = new JSONObject(objectAsString);
+            schema.validate(json);
+        } catch (Exception e) {
+            throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
