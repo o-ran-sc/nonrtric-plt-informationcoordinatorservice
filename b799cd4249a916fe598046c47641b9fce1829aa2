@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b723c33_5f47d229",
+        "filename": "src/main/java/org/oransc/ics/configuration/WebClientConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-05-12T14:40:02Z",
+      "side": 1,
+      "message": "Is it possible to make this redacted, like it was before?",
+      "range": {
+        "startLine": 36,
+        "startChar": 19,
+        "endLine": 36,
+        "endChar": 30
+      },
+      "revId": "b799cd4249a916fe598046c47641b9fce1829aa2",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18927003_fa7e0bac",
+        "filename": "src/main/java/org/oransc/ics/configuration/WebClientConfig.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-05-12T14:40:02Z",
+      "side": 1,
+      "message": "Is it possible to make this redacted, like it was before?",
+      "range": {
+        "startLine": 40,
+        "startChar": 19,
+        "endLine": 40,
+        "endChar": 37
+      },
+      "revId": "b799cd4249a916fe598046c47641b9fce1829aa2",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
