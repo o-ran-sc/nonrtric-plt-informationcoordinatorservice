@@ -30,7 +30,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.immutables.gson.Gson;
 import org.oransc.ics.repository.InfoJobs;
 import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoTypes;
@@ -58,7 +57,6 @@ public class StatusController {
     @Autowired
     private InfoProducers infoProducers;
 
-    @Gson.TypeAdapters
     @Schema(name = "service_status_info")
     public static class StatusInfo {
         @Schema(name = "status", description = "status text")

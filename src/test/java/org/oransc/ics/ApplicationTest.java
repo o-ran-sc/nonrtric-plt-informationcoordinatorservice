@@ -48,8 +48,6 @@ import org.oransc.ics.clients.AsyncRestClient;
 import org.oransc.ics.clients.AsyncRestClientFactory;
 import org.oransc.ics.clients.SecurityContext;
 import org.oransc.ics.configuration.ApplicationConfig;
-import org.oransc.ics.configuration.ImmutableHttpProxyConfig;
-import org.oransc.ics.configuration.ImmutableWebClientConfig;
 import org.oransc.ics.configuration.WebClientConfig;
 import org.oransc.ics.configuration.WebClientConfig.HttpProxyConfig;
 import org.oransc.ics.controller.A1eCallbacksSimulatorController;
@@ -1220,18 +1218,18 @@ class ApplicationTest {
 
     private AsyncRestClient restClient(boolean useTrustValidation) {
         WebClientConfig config = this.applicationConfig.getWebClientConfig();
-        HttpProxyConfig httpProxyConfig = ImmutableHttpProxyConfig.builder() //
+        HttpProxyConfig httpProxyConfig = HttpProxyConfig.builder() //
             .httpProxyHost("") //
             .httpProxyPort(0) //
             .build();
-        config = ImmutableWebClientConfig.builder() //
-            .keyStoreType(config.keyStoreType()) //
-            .keyStorePassword(config.keyStorePassword()) //
-            .keyStore(config.keyStore()) //
-            .keyPassword(config.keyPassword()) //
+        config = WebClientConfig.builder() //
+            .keyStoreType(config.getKeyStoreType()) //
+            .keyStorePassword(config.getKeyStorePassword()) //
+            .keyStore(config.getKeyStore()) //
+            .keyPassword(config.getKeyPassword()) //
             .isTrustStoreUsed(useTrustValidation) //
-            .trustStore(config.trustStore()) //
-            .trustStorePassword(config.trustStorePassword()) //
+            .trustStore(config.getTrustStore()) //
+            .trustStorePassword(config.getTrustStorePassword()) //
             .httpProxyConfig(httpProxyConfig).build();
 
         AsyncRestClientFactory restClientFactory = new AsyncRestClientFactory(config, securityContext);

@@ -27,9 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Collection;
 
-import org.immutables.gson.Gson;
 
-@Gson.TypeAdapters
 @Schema(name = "producer_registration_info", description = "Information for an Information Producer")
 public class ProducerRegistrationInfo {
 

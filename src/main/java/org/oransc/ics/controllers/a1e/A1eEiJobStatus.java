@@ -25,13 +25,10 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import org.immutables.gson.Gson;
 
-@Gson.TypeAdapters
 @Schema(name = "EiJobStatusObject", description = "Status for an EI job")
 public class A1eEiJobStatus {
 
-    @Gson.TypeAdapters
     @Schema(name = "EiJobStatusValues", description = OPERATIONAL_STATE_DESCRIPTION)
     public enum EiJobStatusValues {
         ENABLED, DISABLED

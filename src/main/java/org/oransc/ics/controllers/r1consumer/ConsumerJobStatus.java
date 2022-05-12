@@ -27,13 +27,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Collection;
 
-import org.immutables.gson.Gson;
 
-@Gson.TypeAdapters
 @Schema(name = "consumer_job_status", description = "Status for an Information Job")
 public class ConsumerJobStatus {
 
-    @Gson.TypeAdapters
     @Schema(name = "info_job_status_values", description = OPERATIONAL_STATE_DESCRIPTION)
     public enum InfoJobStatusValues {
         ENABLED, DISABLED

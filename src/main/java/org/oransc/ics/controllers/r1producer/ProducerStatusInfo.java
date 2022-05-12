@@ -25,13 +25,10 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import org.immutables.gson.Gson;
 
-@Gson.TypeAdapters
 @Schema(name = "producer_status", description = "Status for an Info Producer")
 public class ProducerStatusInfo {
 
-    @Gson.TypeAdapters
     @Schema(name = "producer_operational_state", description = "Represents the operational states")
     public enum OperationalState {
         ENABLED, DISABLED

@@ -25,9 +25,7 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import org.immutables.gson.Gson;
 
-@Gson.TypeAdapters
 @Schema(name = "consumer_information_type", description = "Information for an Information type")
 public class ConsumerInfoTypeInfo {
 
@@ -36,7 +34,6 @@ public class ConsumerInfoTypeInfo {
     @JsonProperty(value = "job_data_schema", required = true)
     public Object jobDataSchema;
 
-    @Gson.TypeAdapters
     @Schema(name = "consumer_type_status_values", description = STATUS_DESCRIPTION)
     public enum ConsumerTypeStatusValues {
         ENABLED, DISABLED

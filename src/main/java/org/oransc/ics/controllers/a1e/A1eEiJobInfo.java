@@ -25,9 +25,6 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import org.immutables.gson.Gson;
-
-@Gson.TypeAdapters
 @Schema(name = "EiJobObject", description = "Information for an Enrichment Information Job")
 public class A1eEiJobInfo {
 
