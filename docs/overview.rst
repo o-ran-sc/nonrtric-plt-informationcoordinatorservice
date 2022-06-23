@@ -9,6 +9,8 @@ The Information Coordination Service (ICS) is a generic service that maintains d
 to decouple data consumers and data producers in a multi vendor environment. A data consumer does not need to know anything about
 the producers of the data.
 
+This product is a part of :doc:`NONRTRIC <nonrtric:index>`.
+
 The following terms are used:
 
 * **Data Consumer**, is a subscriber of data. Subscription is done by creating an "Information Job". A data consumer can for instance be an R-App (using the R1 API) or a NearRT-RIC consuming Enrichment Information (and uses the A1-EI API provided by this service).

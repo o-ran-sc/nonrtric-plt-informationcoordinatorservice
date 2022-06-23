@@ -14,5 +14,3 @@ Non-RT RIC Information Coordination Service
    ./api-docs.rst
    ./installation-guide.rst
    ./release-notes.rst
-
-* :ref:`search`
