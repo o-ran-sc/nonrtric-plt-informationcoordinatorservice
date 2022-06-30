@@ -15,7 +15,7 @@
 API-Docs
 ========
 
-Here we describe the APIs to access the Non-RT RIC Information Coordination Service.
+Here we describe the API to access the Non-RT RIC Information Coordination Service.
 
 Information Coordinator Service
 ===============================

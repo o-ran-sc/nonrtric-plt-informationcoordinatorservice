@@ -7,10 +7,8 @@ Developer Guide
 
 This document provides a quickstart for developers of the Non-RT RIC Information Coordinator Service.
 
-Additional developer guides are available on the `O-RAN SC NONRTRIC Developer wiki <https://wiki.o-ran-sc.org/display/RICNR/Release+E>`_.
+Additional developer guides are available on the `O-RAN SC NONRTRIC Developer wiki <https://wiki.o-ran-sc.org/display/RICNR/Release+F>`_.
 
-Information Coordinator Service
--------------------------------
 The Information Coordinator Service is a Java 11 web application built using the Spring Framework. Using Spring Boot
 dependencies, it runs as a standalone application.
 
@@ -53,7 +51,7 @@ Then start the container by running the following command:
     +--------------------------------------------------------------------+
 
 Kubernetes deployment
----------------------
++++++++++++++++++++++
 
 Non-RT RIC can be also deployed in a Kubernetes cluster, `it/dep repository <https://gerrit.o-ran-sc.org/r/admin/repos/it/dep>`_.
 hosts deployment and integration artifacts. Instructions and helm charts to deploy the Non-RT-RIC functions in the
@@ -61,5 +59,5 @@ OSC NONRTRIC integrated test environment can be found in the *./nonrtric* direct
 
 For more information on installation of NonRT-RIC in Kubernetes, see `Deploy NONRTRIC in Kubernetes <https://wiki.o-ran-sc.org/display/RICNR/Deploy+NONRTRIC+in+Kubernetes>`_.
 
-For more information see `Integration and Testing documentation on the O-RAN-SC wiki <https://docs.o-ran-sc.org/projects/o-ran-sc-it-dep/en/latest/index.html>`_.
+For more information see `Integration and Testing documentation in the O-RAN-SC <https://docs.o-ran-sc.org/projects/o-ran-sc-it-dep/en/latest/index.html>`_.
 
