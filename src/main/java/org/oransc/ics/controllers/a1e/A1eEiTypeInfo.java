@@ -22,7 +22,6 @@ package org.oransc.ics.controllers.a1e;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-
 @Schema(name = "EiTypeObject", description = "Information for an EI type")
 public class A1eEiTypeInfo {
 
