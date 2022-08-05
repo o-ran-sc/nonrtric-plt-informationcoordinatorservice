@@ -25,7 +25,6 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-
 @Schema(name = "consumer_job", description = "Information for an Information Job")
 public class ConsumerJobInfo {
 

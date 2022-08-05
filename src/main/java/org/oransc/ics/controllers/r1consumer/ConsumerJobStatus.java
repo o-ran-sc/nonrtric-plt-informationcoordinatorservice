@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Collection;
 
-
 @Schema(name = "consumer_job_status", description = "Status for an Information Job")
 public class ConsumerJobStatus {
 
