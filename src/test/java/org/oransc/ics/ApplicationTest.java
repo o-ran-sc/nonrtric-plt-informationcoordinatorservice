@@ -43,7 +43,6 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.oransc.ics.clients.AsyncRestClient;
 import org.oransc.ics.clients.AsyncRestClientFactory;
 import org.oransc.ics.clients.SecurityContext;
@@ -93,18 +92,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
     properties = { //
         "server.ssl.key-store=./config/keystore.jks", //
         "app.webclient.trust-store=./config/truststore.jks", //
+        "app.webclient.trust-store-used=true", //
         "app.vardata-directory=./target"})
 class ApplicationTest {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -203,6 +201,14 @@ class ApplicationTest {
         putInfoProducerWithOneType(PRODUCER_ID, "test");
         String url = A1eConsts.API_ROOT + "/eitypes";
         String rsp = restClient().get(url).block();
+        assertThat(rsp).isEqualTo("[\"test\"]");
+    }
+
+    @Test
+    void testTrustValidation() throws Exception {
+        putInfoProducerWithOneType(PRODUCER_ID, "test");
+        String url = A1eConsts.API_ROOT + "/eitypes";
+        String rsp = restClient(true).get(url).block();
         assertThat(rsp).isEqualTo("[\"test\"]");
     }
 
