@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -48,6 +49,8 @@ import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoType;
 import org.oransc.ics.repository.InfoTypeSubscriptions;
 import org.oransc.ics.repository.InfoTypes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -66,6 +69,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProducerController {
 
     private static Gson gson = new GsonBuilder().create();
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Autowired
     private InfoJobs infoJobs;
@@ -90,6 +94,7 @@ public class ProducerController {
         })
     public ResponseEntity<Object> getInfoTypdentifiers( //
     ) {
+        logger.debug("GET info type identifiers");
         List<String> result = new ArrayList<>();
         for (InfoType infoType : this.infoTypes.getAllInfoTypes()) {
             result.add(infoType.getId());
@@ -115,6 +120,7 @@ public class ProducerController {
     public ResponseEntity<Object> getInfoType( //
         @PathVariable(ProducerConsts.INFO_TYPE_ID_PATH) String infoTypeId) {
         try {
+            logger.debug("GET info type, infoTypeId: {}", infoTypeId);
             InfoType t = this.infoTypes.getType(infoTypeId);
             ProducerInfoTypeInfo info = toInfoTypeInfo(t);
             return new ResponseEntity<>(gson.toJson(info), HttpStatus.OK);
@@ -144,6 +150,8 @@ public class ProducerController {
     public ResponseEntity<Object> putInfoType( //
         @PathVariable(ProducerConsts.INFO_TYPE_ID_PATH) String infoTypeId, //
         @RequestBody ProducerInfoTypeInfo registrationInfo) {
+
+        logger.debug("PUT info type, infoTypeId: {}, info: {}", infoTypeId, registrationInfo);
 
         InfoType previousDefinition = this.infoTypes.get(infoTypeId);
         if (registrationInfo.jobDataSchema == null) {
@@ -182,6 +190,7 @@ public class ProducerController {
     public ResponseEntity<Object> deleteInfoType( //
         @PathVariable(ProducerConsts.INFO_TYPE_ID_PATH) String infoTypeId) {
 
+        logger.debug("DELETE info type, infoTypeId: {}", infoTypeId);
         InfoType type = this.infoTypes.get(infoTypeId);
         if (type == null) {
             return ErrorResponse.create("Information type not found", HttpStatus.NOT_FOUND);
@@ -212,6 +221,7 @@ public class ProducerController {
             description = "If given, only the producers for the EI Data type is returned.") //
         @RequestParam(name = ProducerConsts.INFO_TYPE_ID_PARAM, required = false) String typeId //
     ) {
+        logger.debug("GET producer identifiers");
         List<String> result = new ArrayList<>();
         for (InfoProducer infoProducer : typeId == null ? this.infoProducers.getAllProducers()
             : this.infoProducers.getProducersForType(typeId)) {
@@ -239,6 +249,7 @@ public class ProducerController {
     public ResponseEntity<Object> getInfoProducer( //
         @PathVariable(ProducerConsts.INFO_PRODUCER_ID_PATH) String infoProducerId) {
         try {
+            logger.debug("GET info producer, infoProducerId: {}", infoProducerId);
             InfoProducer producer = this.infoProducers.getProducer(infoProducerId);
             ProducerRegistrationInfo info = toProducerRegistrationInfo(producer);
             return new ResponseEntity<>(gson.toJson(info), HttpStatus.OK);
@@ -267,6 +278,7 @@ public class ProducerController {
     public ResponseEntity<Object> getInfoProducerJobs( //
         @PathVariable(ProducerConsts.INFO_PRODUCER_ID_PATH) String infoProducerId) {
         try {
+            logger.debug("GET info producer, infoProducerId: {}", infoProducerId);
             InfoProducer producer = this.infoProducers.getProducer(infoProducerId);
             Collection<ProducerJobInfo> producerJobs = new ArrayList<>();
             for (InfoType type : producer.getInfoTypes()) {
@@ -300,6 +312,7 @@ public class ProducerController {
     public ResponseEntity<Object> getInfoProducerStatus( //
         @PathVariable(ProducerConsts.INFO_PRODUCER_ID_PATH) String infoProducerId) {
         try {
+            logger.debug("GET producer status, infoProducerId: {}", infoProducerId);
             InfoProducer producer = this.infoProducers.getProducer(infoProducerId);
             return new ResponseEntity<>(gson.toJson(producerStatusInfo(producer)), HttpStatus.OK);
         } catch (Exception e) {
@@ -340,6 +353,7 @@ public class ProducerController {
         @PathVariable("infoProducerId") String infoProducerId, //
         @RequestBody ProducerRegistrationInfo registrationInfo) {
         try {
+            logger.debug("PUT info producer, infoProducerId: {}, body: {}", infoProducerId, registrationInfo);
             validateUri(registrationInfo.jobCallbackUrl);
             validateUri(registrationInfo.producerSupervisionCallbackUrl);
             InfoProducer previousDefinition = this.infoProducers.get(infoProducerId);
@@ -387,6 +401,7 @@ public class ProducerController {
     public ResponseEntity<Object> deleteInfoProducer(
         @PathVariable(ProducerConsts.INFO_PRODUCER_ID_PATH) String infoProducerId) {
         try {
+            logger.debug("DELETE info producer, infoProducerId: {}", infoProducerId);
             final InfoProducer producer = this.infoProducers.getProducer(infoProducerId);
             this.infoProducers.deregisterProducer(producer);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

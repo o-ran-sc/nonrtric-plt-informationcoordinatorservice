@@ -24,7 +24,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.ToString;
 
+@ToString
 @Schema(name = "consumer_job", description = "Information for an Information Job")
 public class ConsumerJobInfo {
 

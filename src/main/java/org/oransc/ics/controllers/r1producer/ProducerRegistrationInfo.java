@@ -27,6 +27,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Collection;
 
+import lombok.ToString;
+
+@ToString
 @Schema(name = "producer_registration_info", description = "Information for an Information Producer")
 public class ProducerRegistrationInfo {
 

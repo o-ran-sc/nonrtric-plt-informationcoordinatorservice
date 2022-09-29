@@ -25,7 +25,9 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ToString
 @EqualsAndHashCode
 @Schema(name = "consumer_type_subscription_info", description = "Information for an information type subscription")
 public class ConsumerTypeSubscriptionInfo {

@@ -103,6 +103,7 @@ public class ConsumerController {
         })
     public ResponseEntity<Object> getinfoTypeIdentifiers( //
     ) {
+        logger.debug("GET info type identifier");
         List<String> result = new ArrayList<>();
         for (InfoType infoType : this.infoTypes.getAllInfoTypes()) {
             result.add(infoType.getId());
@@ -127,6 +128,7 @@ public class ConsumerController {
     public ResponseEntity<Object> getInfoType( //
         @PathVariable(ConsumerConsts.INFO_TYPE_ID_PATH) String infoTypeId) {
         try {
+            logger.debug("GET info type {}", infoTypeId);
             InfoType type = this.infoTypes.getType(infoTypeId);
             ConsumerInfoTypeInfo info = toInfoTypeInfo(type);
             return new ResponseEntity<>(gson.toJson(info), HttpStatus.OK);
@@ -160,6 +162,7 @@ public class ConsumerController {
             description = ConsumerConsts.OWNER_PARAM_DESCRIPTION) //
         @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = false) String owner) {
         try {
+            logger.debug("GET info jobs, id: {}, owner: {}", infoTypeId, owner);
             List<String> result = new ArrayList<>();
             if (owner != null) {
                 for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
@@ -196,6 +199,7 @@ public class ConsumerController {
     public ResponseEntity<Object> getIndividualEiJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId) {
         try {
+            logger.debug("GET info job, id: {}", infoJobId);
             InfoJob job = this.infoJobs.getJob(infoJobId);
             return new ResponseEntity<>(gson.toJson(toInfoJobInfo(job)), HttpStatus.OK);
         } catch (Exception e) {
@@ -219,6 +223,7 @@ public class ConsumerController {
     public ResponseEntity<Object> getEiJobStatus( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId) {
         try {
+            logger.debug("GET info job status, id: {}", jobId);
             InfoJob job = this.infoJobs.getJob(jobId);
             return new ResponseEntity<>(gson.toJson(toInfoJobStatus(job)), HttpStatus.OK);
         } catch (Exception e) {
@@ -256,6 +261,7 @@ public class ConsumerController {
     public ResponseEntity<Object> deleteIndividualEiJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId) {
         try {
+            logger.debug("DELETE info job, id: {}", jobId);
             InfoJob job = this.infoJobs.getJob(jobId);
             this.infoJobs.remove(job, this.infoProducers);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -297,6 +303,8 @@ public class ConsumerController {
 
         final boolean isNewJob = this.infoJobs.get(jobId) == null;
 
+        logger.debug("PUT info job, id: {}, obj: {}", jobId, informationJobObject);
+
         return validatePutInfoJob(jobId, informationJobObject) //
             .flatMap(this::startInfoSubscriptionJob) //
             .doOnNext(this.infoJobs::put) //
@@ -322,6 +330,7 @@ public class ConsumerController {
             description = ConsumerConsts.OWNER_PARAM_DESCRIPTION) //
         @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = false) String owner) {
         try {
+            logger.debug("GET info type subscriptions, owner: {}", owner);
             List<String> result = new ArrayList<>();
             if (owner != null) {
                 this.infoTypeSubscriptions.getSubscriptionsForOwner(owner)
@@ -352,6 +361,7 @@ public class ConsumerController {
     public ResponseEntity<Object> getIndividualTypeSubscription( //
         @PathVariable(ConsumerConsts.SUBSCRIPTION_ID_PATH) String subscriptionId) {
         try {
+            logger.debug("GET info type subscription, subscriptionId: {}", subscriptionId);
             InfoTypeSubscriptions.SubscriptionInfo subscription =
                 this.infoTypeSubscriptions.getSubscription(subscriptionId);
             return new ResponseEntity<>(gson.toJson(toTypeSuscriptionInfo(subscription)), HttpStatus.OK);
@@ -382,6 +392,7 @@ public class ConsumerController {
         @PathVariable(ConsumerConsts.SUBSCRIPTION_ID_PATH) String subscriptionId, //
         @RequestBody ConsumerTypeSubscriptionInfo subscription) {
 
+        logger.debug("PUT info type subscription, subscriptionId: {}, body: {}", subscriptionId, subscription);
         final boolean isNewSubscription = this.infoTypeSubscriptions.get(subscriptionId) == null;
         this.infoTypeSubscriptions.put(toTypeSuscriptionInfo(subscription, subscriptionId));
         return Mono.just(new ResponseEntity<>(isNewSubscription ? HttpStatus.CREATED : HttpStatus.OK));
@@ -407,6 +418,7 @@ public class ConsumerController {
     public ResponseEntity<Object> deleteIndividualTypeSubscription( //
         @PathVariable(ConsumerConsts.SUBSCRIPTION_ID_PATH) String subscriptionId) {
         try {
+            logger.debug("DELETE info type subscription, subscriptionId: {}", subscriptionId);
             InfoTypeSubscriptions.SubscriptionInfo subscription =
                 this.infoTypeSubscriptions.getSubscription(subscriptionId);
             this.infoTypeSubscriptions.remove(subscription);

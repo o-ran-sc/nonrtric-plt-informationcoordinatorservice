@@ -26,7 +26,11 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.lang.invoke.MethodHandles;
+
 import org.oransc.ics.exceptions.ServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +39,7 @@ import reactor.core.publisher.Mono;
 
 public class ErrorResponse {
     private static Gson gson = new GsonBuilder().create();
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // Returned as body for all failed REST calls
     @Schema(
@@ -96,10 +101,11 @@ public class ErrorResponse {
                 code = se.getHttpStatus();
             }
         }
-        return create(e.toString(), code);
+        return create(e.getMessage(), code);
     }
 
     public static ResponseEntity<Object> create(String str, HttpStatus code) {
+        logger.debug("Error response: {}, {}", code, str);
         ErrorInfo errorInfo = new ErrorInfo(str, code.value());
         String json = gson.toJson(errorInfo);
         HttpHeaders headers = new HttpHeaders();

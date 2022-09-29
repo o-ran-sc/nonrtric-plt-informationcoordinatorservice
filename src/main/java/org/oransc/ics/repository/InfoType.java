@@ -21,7 +21,9 @@
 package org.oransc.ics.repository;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 public class InfoType {
     @Getter
     private final String id;
