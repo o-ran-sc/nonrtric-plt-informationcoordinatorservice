@@ -183,6 +183,33 @@ public class ConsumerController {
         }
     }
 
+    @DeleteMapping(path = "/info-jobs", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Information Jobs", description = "delete all jobs for one owner")
+    @ApiResponses(
+        value = { //
+            @ApiResponse(
+                responseCode = "200",
+                description = "Information information jobs", //
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class))))})
+    public ResponseEntity<Object> deleteJobsForOwner( //
+
+        @Parameter(
+            name = ConsumerConsts.OWNER_PARAM,
+            required = true, //
+            description = ConsumerConsts.OWNER_PARAM_DESCRIPTION) //
+        @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = true) String owner) {
+        try {
+            for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
+
+                logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(), job.getTypeId(), owner);
+                this.infoJobs.remove(job, this.infoProducers);
+            }
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping(path = "/info-jobs/{infoJobId}", produces = MediaType.APPLICATION_JSON_VALUE) //
     @Operation(summary = ConsumerConsts.INDIVIDUAL_JOB, description = "") //
     @ApiResponses(
