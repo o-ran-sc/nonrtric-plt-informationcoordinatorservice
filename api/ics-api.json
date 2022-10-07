@@ -608,41 +608,63 @@
             }},
             "tags": ["Actuator"]
         }},
-        "/data-consumer/v1/info-jobs": {"get": {
-            "summary": "Information Job identifiers",
-            "description": "query for information job identifiers",
-            "operationId": "getJobIds",
-            "responses": {
-                "200": {
-                    "description": "Information information job identifiers",
+        "/data-consumer/v1/info-jobs": {
+            "get": {
+                "summary": "Information Job identifiers",
+                "description": "query for information job identifiers",
+                "operationId": "getJobIds",
+                "responses": {
+                    "200": {
+                        "description": "Information information job identifiers",
+                        "content": {"application/json": {"schema": {
+                            "type": "array",
+                            "items": {"type": "string"}
+                        }}}
+                    },
+                    "404": {
+                        "description": "Information type is not found",
+                        "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProblemDetails"}}}
+                    }
+                },
+                "parameters": [
+                    {
+                        "schema": {"type": "string"},
+                        "in": "query",
+                        "name": "infoTypeId",
+                        "description": "selects subscription jobs of matching information type",
+                        "required": false
+                    },
+                    {
+                        "schema": {"type": "string"},
+                        "in": "query",
+                        "name": "owner",
+                        "description": "selects result for one owner",
+                        "required": false
+                    }
+                ],
+                "tags": ["Data consumer"]
+            },
+            "delete": {
+                "summary": "Information Jobs",
+                "description": "delete all jobs for one owner",
+                "operationId": "deleteJobsForOwner",
+                "responses": {"200": {
+                    "description": "Information information jobs",
                     "content": {"application/json": {"schema": {
                         "type": "array",
                         "items": {"type": "string"}
                     }}}
-                },
-                "404": {
-                    "description": "Information type is not found",
-                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ProblemDetails"}}}
-                }
-            },
-            "parameters": [
-                {
-                    "schema": {"type": "string"},
-                    "in": "query",
-                    "name": "infoTypeId",
-                    "description": "selects subscription jobs of matching information type",
-                    "required": false
-                },
-                {
+                }},
+                "parameters": [{
                     "schema": {"type": "string"},
                     "in": "query",
                     "name": "owner",
                     "description": "selects result for one owner",
-                    "required": false
-                }
-            ],
-            "tags": ["Data consumer"]
-        }},
+                    "required": true
+                }],
+                "tags": ["Data consumer"]
+            }
+        },
         "/actuator/loggers/{name}": {
             "post": {
                 "summary": "Actuator web endpoint 'loggers-name'",

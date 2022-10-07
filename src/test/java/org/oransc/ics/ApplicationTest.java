@@ -221,6 +221,23 @@ class ApplicationTest {
     }
 
     @Test
+    void consumerDeleteJobsForOneOwner() throws Exception {
+        putInfoProducerWithOneType("producer1", TYPE_ID);
+        putInfoJob(TYPE_ID, "jobId1");
+        putInfoJob(TYPE_ID, "jobId2");
+        assertThat(this.infoJobs.size()).isEqualTo(2);
+        String url = ConsumerConsts.API_ROOT + "/info-jobs?owner=owner";
+        restClient().delete(url).block();
+        assertThat(this.infoJobs.size()).isZero();
+
+        assertThat(this.producerSimulator.getTestResults().jobsStarted.size()).isEqualTo(2);
+
+        await()
+            .untilAsserted(() -> assertThat(this.producerSimulator.getTestResults().jobsStopped.size()).isEqualTo(2));
+
+    }
+
+    @Test
     void a1eGetEiTypesEmpty() throws Exception {
         String url = A1eConsts.API_ROOT + "/eitypes";
         String rsp = restClient().get(url).block();
