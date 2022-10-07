@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9ae64dd_7dfc0ad1",
+        "filename": "src/main/java/org/oransc/ics/controllers/r1consumer/ConsumerController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-07T14:17:06Z",
+      "side": 1,
+      "message": "Shouldn\u0027t there be a 404 response also?",
+      "revId": "f48a91efc2483ca72bb3f48eef0baa59ecd0a5a6",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ca8a164_12610109",
+        "filename": "src/main/java/org/oransc/ics/controllers/r1consumer/ConsumerController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-07T14:17:06Z",
+      "side": 1,
+      "message": "Should be 204",
+      "range": {
+        "startLine": 191,
+        "startChar": 32,
+        "endLine": 191,
+        "endChar": 35
+      },
+      "revId": "f48a91efc2483ca72bb3f48eef0baa59ecd0a5a6",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b82df3f1_54d077be",
+        "filename": "src/main/java/org/oransc/ics/controllers/r1consumer/ConsumerController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-07T14:17:06Z",
+      "side": 1,
+      "message": "Not needed since the response is empty?",
+      "range": {
+        "startLine": 192,
+        "startChar": 16,
+        "endLine": 192,
+        "endChar": 64
+      },
+      "revId": "f48a91efc2483ca72bb3f48eef0baa59ecd0a5a6",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5a7c4f8_b4d78b21",
+        "filename": "src/main/java/org/oransc/ics/controllers/r1consumer/ConsumerController.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-07T14:17:06Z",
+      "side": 1,
+      "message": "Not needed since the response is empty?",
+      "range": {
+        "startLine": 193,
+        "startChar": 16,
+        "endLine": 193,
+        "endChar": 106
+      },
+      "revId": "f48a91efc2483ca72bb3f48eef0baa59ecd0a5a6",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0780acba_8f94d097",
+        "filename": "src/test/java/org/oransc/ics/ApplicationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-07T14:17:06Z",
+      "side": 1,
+      "message": "Maybe also add another producer with one job to make sure that only jobs for the specified producer are removed?",
+      "range": {
+        "startLine": 224,
+        "startChar": 9,
+        "endLine": 224,
+        "endChar": 38
+      },
+      "revId": "f48a91efc2483ca72bb3f48eef0baa59ecd0a5a6",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
