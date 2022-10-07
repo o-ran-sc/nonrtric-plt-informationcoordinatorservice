@@ -456,6 +456,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+    delete:
+      tags:
+      - Data consumer
+      summary: Information Jobs
+      description: delete all jobs for one owner
+      operationId: deleteJobsForOwner
+      parameters:
+      - name: owner
+        in: query
+        description: selects result for one owner
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
   /actuator/loggers/{name}:
     get:
       tags:

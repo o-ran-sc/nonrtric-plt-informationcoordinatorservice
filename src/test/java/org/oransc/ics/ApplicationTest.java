@@ -221,6 +221,23 @@ class ApplicationTest {
     }
 
     @Test
+    void consumerDeleteJobsForOneOwner() throws Exception {
+        putInfoProducerWithOneType("producer1", TYPE_ID);
+        putInfoJob(TYPE_ID, "jobId1");
+        putInfoJob(TYPE_ID, "jobId2");
+        putInfoJob(TYPE_ID, "jobId3", "otherOwner");
+        assertThat(this.infoJobs.size()).isEqualTo(3);
+        String url = ConsumerConsts.API_ROOT + "/info-jobs?owner=owner";
+        restClient().delete(url).block();
+        assertThat(this.infoJobs.size()).isEqualTo(1);
+
+        assertThat(this.producerSimulator.getTestResults().jobsStarted).hasSize(3);
+
+        await().untilAsserted(() -> assertThat(this.producerSimulator.getTestResults().jobsStopped).hasSize(2));
+
+    }
+
+    @Test
     void a1eGetEiTypesEmpty() throws Exception {
         String url = A1eConsts.API_ROOT + "/eitypes";
         String rsp = restClient().get(url).block();
@@ -586,8 +603,7 @@ class ApplicationTest {
     }
 
     @Test
-    void producerPutProducerWithOneType_rejecting()
-        throws JsonMappingException, JsonProcessingException, ServiceException {
+    void producerPutProducerWithOneType_rejecting() throws Exception {
         putInfoProducerWithOneTypeRejecting("simulateProducerError", TYPE_ID);
         String url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
         String body = gson.toJson(infoJobInfo());
@@ -683,7 +699,7 @@ class ApplicationTest {
     }
 
     @Test
-    void producerGetInfoJobsForProducer() throws JsonMappingException, JsonProcessingException, ServiceException {
+    void producerGetInfoJobsForProducer() throws Exception {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
         putInfoJob(TYPE_ID, "jobId1");
         putInfoJob(TYPE_ID, "jobId2");
@@ -729,7 +745,7 @@ class ApplicationTest {
     }
 
     @Test
-    void a1eJobStatusNotifications() throws JsonMappingException, JsonProcessingException, ServiceException {
+    void a1eJobStatusNotifications() throws Exception {
         A1eCallbacksSimulatorController.TestResults consumerCalls = this.a1eCallbacksSimulator.getTestResults();
         ProducerSimulatorController.TestResults producerCalls = this.producerSimulator.getTestResults();
 
@@ -753,7 +769,7 @@ class ApplicationTest {
     }
 
     @Test
-    void a1eJobStatusNotifications2() throws JsonMappingException, JsonProcessingException, ServiceException {
+    void a1eJobStatusNotifications2() throws Exception {
         // Test replacing a producer with new and removed types
 
         // Create a job
@@ -803,7 +819,7 @@ class ApplicationTest {
     }
 
     @Test
-    void producerSupervision() throws JsonMappingException, JsonProcessingException, ServiceException {
+    void producerSupervision() throws Exception {
 
         A1eCallbacksSimulatorController.TestResults consumerResults = this.a1eCallbacksSimulator.getTestResults();
         putInfoProducerWithOneTypeRejecting("simulateProducerError", TYPE_ID);
@@ -847,7 +863,7 @@ class ApplicationTest {
     }
 
     @Test
-    void producerSupervision2() throws JsonMappingException, JsonProcessingException, ServiceException {
+    void producerSupervision2() throws Exception {
         // Test that supervision enables not enabled jobs and sends a notification when
         // suceeded
 
@@ -1127,12 +1143,17 @@ class ApplicationTest {
             baseUrl() + A1eCallbacksSimulatorController.getJobStatusUrl(infoJobId));
     }
 
-    private A1eEiJobInfo infoJobInfo() throws JsonMappingException, JsonProcessingException {
+    private A1eEiJobInfo infoJobInfo() throws Exception {
         return infoJobInfo(TYPE_ID, EI_JOB_ID);
     }
 
-    A1eEiJobInfo infoJobInfo(String typeId, String infoJobId) throws JsonMappingException, JsonProcessingException {
-        return new A1eEiJobInfo(typeId, jsonObject(), "owner", "https://junk.com",
+    A1eEiJobInfo infoJobInfo(String typeId, String infoJobId) throws Exception {
+        return infoJobInfo(typeId, infoJobId, "owner");
+
+    }
+
+    A1eEiJobInfo infoJobInfo(String typeId, String infoJobId, String owner) throws Exception {
+        return new A1eEiJobInfo(typeId, jsonObject(), owner, "https://junk.com",
             baseUrl() + A1eCallbacksSimulatorController.getJobStatusUrl(infoJobId));
     }
 
@@ -1169,8 +1190,16 @@ class ApplicationTest {
         return jsonObject("{ " + EI_JOB_PROPERTY + " : \"value\" }");
     }
 
-    private InfoJob putInfoJob(String infoTypeId, String jobId)
-        throws JsonMappingException, JsonProcessingException, ServiceException {
+    private InfoJob putInfoJob(String infoTypeId, String jobId, String owner) throws Exception {
+        String url = A1eConsts.API_ROOT + "/eijobs/" + jobId;
+        String body = gson.toJson(infoJobInfo(infoTypeId, jobId, owner));
+        restClient().putForEntity(url, body).block();
+
+        return this.infoJobs.getJob(jobId);
+
+    }
+
+    private InfoJob putInfoJob(String infoTypeId, String jobId) throws Exception {
 
         String url = A1eConsts.API_ROOT + "/eijobs/" + jobId;
         String body = gson.toJson(infoJobInfo(infoTypeId, jobId));
