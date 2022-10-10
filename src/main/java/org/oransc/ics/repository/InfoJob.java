@@ -67,4 +67,17 @@ public class InfoJob {
         logger.debug("Job status id: {}, enabled: {}", this.isLastStatusReportedEnabled, isEnabled);
     }
 
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof InfoJob) {
+            return this.id.equals(((InfoJob) o).id);
+        }
+        return this.id.equals(o);
+    }
+
 }

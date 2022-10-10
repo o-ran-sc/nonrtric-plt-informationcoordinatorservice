@@ -78,10 +78,10 @@ public class A1eController {
     ApplicationConfig applicationConfig;
 
     @Autowired
-    private InfoJobs eiJobs;
+    private InfoJobs infoJobs;
 
     @Autowired
-    private InfoTypes eiTypes;
+    private InfoTypes infoTypes;
 
     @Autowired
     private InfoProducers infoProducers;
@@ -103,7 +103,7 @@ public class A1eController {
     public ResponseEntity<Object> getEiTypeIdentifiers( //
     ) {
         List<String> result = new ArrayList<>();
-        for (InfoType eiType : this.eiTypes.getAllInfoTypes()) {
+        for (InfoType eiType : this.infoTypes.getAllInfoTypes()) {
             result.add(eiType.getId());
         }
 
@@ -126,7 +126,7 @@ public class A1eController {
     public ResponseEntity<Object> getEiType( //
         @PathVariable("eiTypeId") String eiTypeId) {
         try {
-            this.eiTypes.getType(eiTypeId); // Make sure that the type exists
+            this.infoTypes.getType(eiTypeId); // Make sure that the type exists
             A1eEiTypeInfo info = toEiTypeInfo();
             return new ResponseEntity<>(gson.toJson(info), HttpStatus.OK);
         } catch (Exception e) {
@@ -161,15 +161,15 @@ public class A1eController {
         try {
             List<String> result = new ArrayList<>();
             if (owner != null) {
-                for (InfoJob job : this.eiJobs.getJobsForOwner(owner)) {
+                for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
                     if (eiTypeId == null || job.getTypeId().equals(eiTypeId)) {
                         result.add(job.getId());
                     }
                 }
             } else if (eiTypeId != null) {
-                this.eiJobs.getJobsForType(eiTypeId).forEach(job -> result.add(job.getId()));
+                this.infoJobs.getJobsForType(eiTypeId).forEach(job -> result.add(job.getId()));
             } else {
-                this.eiJobs.getJobs().forEach(job -> result.add(job.getId()));
+                this.infoJobs.getJobs().forEach(job -> result.add(job.getId()));
             }
             return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
         } catch (
@@ -195,7 +195,7 @@ public class A1eController {
     public ResponseEntity<Object> getIndividualEiJob( //
         @PathVariable("eiJobId") String eiJobId) {
         try {
-            InfoJob job = this.eiJobs.getJob(eiJobId);
+            InfoJob job = this.infoJobs.getJob(eiJobId);
             return new ResponseEntity<>(gson.toJson(toEiJobInfo(job)), HttpStatus.OK);
         } catch (Exception e) {
             return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
@@ -218,7 +218,7 @@ public class A1eController {
     public ResponseEntity<Object> getEiJobStatus( //
         @PathVariable("eiJobId") String eiJobId) {
         try {
-            InfoJob job = this.eiJobs.getJob(eiJobId);
+            InfoJob job = this.infoJobs.getJob(eiJobId);
             return new ResponseEntity<>(gson.toJson(toEiJobStatus(job)), HttpStatus.OK);
         } catch (Exception e) {
             return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
@@ -251,8 +251,9 @@ public class A1eController {
     public ResponseEntity<Object> deleteIndividualEiJob( //
         @PathVariable("eiJobId") String eiJobId) {
         try {
-            InfoJob job = this.eiJobs.getJob(eiJobId);
-            this.eiJobs.remove(job, this.infoProducers);
+            InfoJob job = this.infoJobs.getJob(eiJobId);
+            InfoType type = this.infoTypes.getType(job.getTypeId());
+            this.infoJobs.remove(job, type, this.infoProducers);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (Exception e) {
             return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
@@ -263,7 +264,7 @@ public class A1eController {
         path = "/eijobs/{eiJobId}", //
         produces = MediaType.APPLICATION_JSON_VALUE, //
         consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Individual EI job", description = "")
+    @Operation(summary = "Individual EI job", description = A1eConsts.PUT_INDIVIDUAL_JOB_DESCRIPTION)
     @ApiResponses(
         value = { //
             @ApiResponse(
@@ -291,34 +292,37 @@ public class A1eController {
 
     public Mono<ResponseEntity<Object>> putIndividualEiJob( //
         @PathVariable("eiJobId") String eiJobId, //
-        @RequestBody A1eEiJobInfo eiJobObject) {
+        @RequestBody A1eEiJobInfo eiJobObject) throws ServiceException {
 
-        final boolean isNewJob = this.eiJobs.get(eiJobId) == null;
+        final boolean isNewJob = this.infoJobs.get(eiJobId) == null;
+        InfoType eiType = this.infoTypes.getCompatibleType(eiJobObject.eiTypeId);
 
-        return validatePutEiJob(eiJobId, eiJobObject) //
-            .flatMap(this::startEiJob) //
-            .doOnNext(newEiJob -> this.eiJobs.put(newEiJob)) //
+        return validatePutEiJob(eiJobId, eiType, eiJobObject) //
+            .flatMap(job -> startEiJob(job, eiType)) //
+            .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //
             .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
             .onErrorResume(throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.INTERNAL_SERVER_ERROR)));
     }
 
-    private Mono<InfoJob> startEiJob(InfoJob newEiJob) {
-        return this.producerCallbacks.startInfoSubscriptionJob(newEiJob, infoProducers) //
+    private Mono<InfoJob> startEiJob(InfoJob newEiJob, InfoType type) {
+        return this.producerCallbacks.startInfoSubscriptionJob(newEiJob, type, infoProducers) //
             .doOnNext(noOfAcceptingProducers -> this.logger.debug(
                 "Started EI job {}, number of activated producers: {}", newEiJob.getId(), noOfAcceptingProducers)) //
             .map(noOfAcceptingProducers -> newEiJob);
     }
 
-    private Mono<InfoJob> validatePutEiJob(String eiJobId, A1eEiJobInfo eiJobInfo) {
+    private Mono<InfoJob> validatePutEiJob(String eiJobId, InfoType eiType, A1eEiJobInfo eiJobInfo) {
         try {
-            InfoType eiType = this.eiTypes.getType(eiJobInfo.eiTypeId);
             validateJsonObjectAgainstSchema(eiType.getJobDataSchema(), eiJobInfo.jobDefinition);
-            InfoJob existingEiJob = this.eiJobs.get(eiJobId);
             validateUri(eiJobInfo.jobResultUri);
             validateUri(eiJobInfo.statusNotificationUri);
 
-            if (existingEiJob != null && !existingEiJob.getTypeId().equals(eiJobInfo.eiTypeId)) {
-                throw new ServiceException("Not allowed to change type for existing EI job", HttpStatus.CONFLICT);
+            InfoJob existingEiJob = this.infoJobs.get(eiJobId);
+            if (existingEiJob != null) {
+                InfoType.TypeId typeId = InfoType.TypeId.ofString(eiJobInfo.eiTypeId);
+                if (!existingEiJob.getTypeId().contains(typeId.getName())) {
+                    throw new ServiceException("Not allowed to change type for existing EI job", HttpStatus.CONFLICT);
+                }
             }
             return Mono.just(toEiJob(eiJobInfo, eiJobId, eiType));
         } catch (Exception e) {

@@ -207,9 +207,9 @@ public class ProducerSimulatorController {
     }
 
     private void logHeaders(Map<String, String> headers) {
-        logger.debug("Header begin");
-        headers.forEach((key, value) -> logger.debug("  key: {}, value: {}", key, value));
-        logger.debug("Header end");
+        logger.trace("Header begin");
+        headers.forEach((key, value) -> logger.trace("  key: {}, value: {}", key, value));
+        logger.trace("Header end");
     }
 
 }

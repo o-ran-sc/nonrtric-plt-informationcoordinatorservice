@@ -52,21 +52,23 @@ import org.springframework.util.FileSystemUtils;
 public class InfoJobs {
     private Map<String, InfoJob> allEiJobs = new HashMap<>();
 
-    private MultiMap<InfoJob> jobsByType = new MultiMap<>();
-    private MultiMap<InfoJob> jobsByOwner = new MultiMap<>();
+    private MultiMap<String, InfoJob> jobsByType = new MultiMap<>();
+    private MultiMap<String, InfoJob> jobsByOwner = new MultiMap<>();
     private final Gson gson;
+    private final InfoTypes infoTypes;
 
     private final ApplicationConfig config;
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ProducerCallbacks producerCallbacks;
 
-    public InfoJobs(ApplicationConfig config, ProducerCallbacks producerCallbacks) {
+    public InfoJobs(ApplicationConfig config, InfoTypes infoTypes, ProducerCallbacks producerCallbacks) {
         this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
         ServiceLoader.load(TypeAdapterFactory.class).forEach(gsonBuilder::registerTypeAdapterFactory);
         this.gson = gsonBuilder.create();
         this.producerCallbacks = producerCallbacks;
+        this.infoTypes = infoTypes;
     }
 
     public synchronized void restoreJobsFromDatabase() throws IOException {
@@ -113,25 +115,26 @@ public class InfoJobs {
         return allEiJobs.get(id);
     }
 
-    public synchronized InfoJob remove(String id, InfoProducers infoProducers) {
+    public synchronized InfoJob remove(String id, InfoProducers infoProducers) throws ServiceException {
         InfoJob job = allEiJobs.get(id);
         if (job != null) {
-            remove(job, infoProducers);
+            InfoType type = this.infoTypes.getType(job.getTypeId());
+            remove(job, type, infoProducers);
         }
         return job;
     }
 
-    public synchronized void remove(InfoJob job, InfoProducers infoProducers) {
+    public synchronized void remove(InfoJob job, InfoType type, InfoProducers infoProducers) {
         this.allEiJobs.remove(job.getId());
-        jobsByType.remove(job.getTypeId(), job.getId());
-        jobsByOwner.remove(job.getOwner(), job.getId());
+        jobsByType.remove(job.getTypeId(), job);
+        jobsByOwner.remove(job.getOwner(), job);
 
         try {
             Files.delete(getPath(job));
         } catch (IOException e) {
             logger.warn("Could not remove file: {}", e.getMessage());
         }
-        this.producerCallbacks.stopInfoJob(job, infoProducers);
+        this.producerCallbacks.stopInfoJob(job, type, infoProducers);
     }
 
     public synchronized int size() {
@@ -156,8 +159,8 @@ public class InfoJobs {
 
     private void doPut(InfoJob job) {
         allEiJobs.put(job.getId(), job);
-        jobsByType.put(job.getTypeId(), job.getId(), job);
-        jobsByOwner.put(job.getOwner(), job.getId(), job);
+        jobsByType.put(job.getTypeId(), job);
+        jobsByOwner.put(job.getOwner(), job);
     }
 
     private void storeJobInFile(InfoJob job) {

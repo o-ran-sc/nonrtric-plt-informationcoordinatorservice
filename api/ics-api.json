@@ -726,7 +726,7 @@
         }},
         "/A1-EI/v1/eijobs/{eiJobId}/status": {"get": {
             "summary": "EI job status",
-            "operationId": "getEiJobStatus_1",
+            "operationId": "getEiJobStatus",
             "responses": {
                 "200": {
                     "description": "EI job status",
@@ -768,7 +768,7 @@
         }},
         "/data-consumer/v1/info-jobs/{infoJobId}/status": {"get": {
             "summary": "Job status",
-            "operationId": "getEiJobStatus",
+            "operationId": "getInfoJobStatus",
             "responses": {
                 "200": {
                     "description": "Information subscription job status",
@@ -950,7 +950,7 @@
         "/A1-EI/v1/eijobs/{eiJobId}": {
             "get": {
                 "summary": "Individual EI job",
-                "operationId": "getIndividualEiJob_1",
+                "operationId": "getIndividualEiJob",
                 "responses": {
                     "200": {
                         "description": "EI job",
@@ -971,7 +971,7 @@
             },
             "delete": {
                 "summary": "Individual EI job",
-                "operationId": "deleteIndividualEiJob_1",
+                "operationId": "deleteIndividualEiJob",
                 "responses": {
                     "200": {
                         "description": "Not used",
@@ -1000,6 +1000,7 @@
                     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/EiJobObject"}}},
                     "required": true
                 },
+                "description": "If the requested info_type_id is not found, an attempt to find a compatible version is made. As an example, 'type_1.9.0' is backwards compatible with 'type_1.0.0'",
                 "operationId": "putIndividualEiJob",
                 "responses": {
                     "200": {
@@ -1044,7 +1045,7 @@
         "/data-consumer/v1/info-jobs/{infoJobId}": {
             "get": {
                 "summary": "Individual data subscription job",
-                "operationId": "getIndividualEiJob",
+                "operationId": "getIndividualInfoJob",
                 "responses": {
                     "200": {
                         "description": "Information subscription job",
@@ -1065,7 +1066,7 @@
             },
             "delete": {
                 "summary": "Individual data subscription job",
-                "operationId": "deleteIndividualEiJob",
+                "operationId": "deleteIndividualInfoJob",
                 "responses": {
                     "200": {
                         "description": "Not used",
@@ -1094,7 +1095,7 @@
                     "content": {"application/json": {"schema": {"$ref": "#/components/schemas/consumer_job"}}},
                     "required": true
                 },
-                "description": "The job will be enabled when a producer is available",
+                "description": "The job will be enabled when a producer is available. If the requested info_type_id is not found, an attempt to find a compatible version is made. As an example, 'type_1.9.0' is backwards compatible with 'type_1.0.0'",
                 "operationId": "putIndividualInfoJob",
                 "responses": {
                     "200": {
@@ -1141,7 +1142,7 @@
                 "schema": {"type": "string"},
                 "in": "query",
                 "name": "infoTypeId",
-                "description": "If given, only the producers for the EI Data type is returned.",
+                "description": "If given, only the producers for the Info Type is returned.",
                 "required": false
             }],
             "tags": ["Data producer (registration)"]

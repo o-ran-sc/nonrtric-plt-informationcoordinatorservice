@@ -27,9 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import org.oransc.ics.controllers.a1e.A1eCallbacks;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.exceptions.ServiceException;
@@ -46,8 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InfoProducers {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final Map<String, InfoProducer> allEiProducers = new HashMap<>();
-    private final MultiMap<InfoProducer> producersByType = new MultiMap<>();
+    private final Map<String, InfoProducer> allInfoProducers = new HashMap<>();
 
     @Autowired
     private ProducerCallbacks producerCallbacks;
@@ -58,33 +54,15 @@ public class InfoProducers {
     @Autowired
     private InfoJobs infoJobs;
 
-    @Builder
-    @Getter
-    public static class InfoProducerRegistrationInfo {
-        String id;
-
-        Collection<InfoType> supportedTypes;
-
-        String jobCallbackUrl;
-
-        String producerSupervisionCallbackUrl;
-    }
+    @Autowired
+    private InfoTypes infoTypes;
 
     public InfoProducer registerProducer(InfoProducerRegistrationInfo producerInfo) {
         final String producerId = producerInfo.getId();
         InfoProducer previousDefinition = this.get(producerId);
-        if (previousDefinition != null) {
-            for (InfoType type : previousDefinition.getInfoTypes()) {
-                producersByType.remove(type.getId(), producerId);
-            }
-            allEiProducers.remove(producerId);
-        }
 
         InfoProducer producer = createProducer(producerInfo);
-        allEiProducers.put(producer.getId(), producer);
-        for (InfoType type : producer.getInfoTypes()) {
-            producersByType.put(type.getId(), producer.getId(), producer);
-        }
+        allInfoProducers.put(producer.getId(), producer);
 
         Collection<InfoType> previousTypes =
             previousDefinition != null ? previousDefinition.getInfoTypes() : new ArrayList<>();
@@ -105,11 +83,11 @@ public class InfoProducers {
     }
 
     public synchronized Collection<InfoProducer> getAllProducers() {
-        return new Vector<>(allEiProducers.values());
+        return new Vector<>(allInfoProducers.values());
     }
 
     public synchronized InfoProducer getProducer(String id) throws ServiceException {
-        InfoProducer p = allEiProducers.get(id);
+        InfoProducer p = allInfoProducers.get(id);
         if (p == null) {
             throw new ServiceException("Could not find Information Producer: " + id, HttpStatus.NOT_FOUND);
         }
@@ -117,50 +95,57 @@ public class InfoProducers {
     }
 
     public synchronized InfoProducer get(String id) {
-        return allEiProducers.get(id);
+        return allInfoProducers.get(id);
     }
 
     public synchronized int size() {
-        return allEiProducers.size();
+        return allInfoProducers.size();
     }
 
     public synchronized void clear() {
-        this.allEiProducers.clear();
-        this.producersByType.clear();
+        this.allInfoProducers.clear();
     }
 
     public void deregisterProducer(InfoProducer producer) {
-        allEiProducers.remove(producer.getId());
-        for (InfoType type : producer.getInfoTypes()) {
-            if (producersByType.remove(type.getId(), producer.getId()) == null) {
-                this.logger.error("Bug, no producer found");
-            }
-        }
+        allInfoProducers.remove(producer.getId());
         this.consumerCallbacks.notifyJobStatus(producer.getInfoTypes(), this) //
             .subscribe();
+
     }
 
-    public synchronized Collection<InfoProducer> getProducersForType(InfoType type) {
-        return this.producersByType.get(type.getId());
+    public synchronized Collection<InfoProducer> getProducersSupportingType(InfoType type) {
+        InfoType.TypeId id = type.getTypeId();
+        Collection<InfoProducer> result = new ArrayList<>();
+        for (InfoProducer producer : this.allInfoProducers.values()) {
+            if (producer.getInfoTypes().contains(type)
+                || !InfoType.filterCompatibleWithVersion(producer.getInfoTypes(), id).isEmpty()) {
+                result.add(producer);
+            }
+        }
+
+        return result;
     }
 
-    public synchronized Collection<InfoProducer> getProducersForType(String typeId) {
-        return this.producersByType.get(typeId);
-    }
-
-    public synchronized Collection<String> getProducerIdsForType(String typeId) {
+    public synchronized Collection<String> getProducerIdsForType(InfoType type) {
         Collection<String> producerIds = new ArrayList<>();
-        for (InfoProducer p : this.getProducersForType(typeId)) {
+        for (InfoProducer p : this.getProducersSupportingType(type)) {
             producerIds.add(p.getId());
         }
         return producerIds;
     }
 
     public synchronized boolean isJobEnabled(InfoJob job) {
-        for (InfoProducer producer : this.producersByType.get(job.getTypeId())) {
-            if (producer.isJobEnabled(job)) {
-                return true;
+        InfoType type;
+        try {
+            type = this.infoTypes.getType(job.getTypeId());
+
+            for (InfoProducer producer : this.getProducersSupportingType(type)) {
+                if (producer.isJobEnabled(job)) {
+                    return true;
+                }
             }
+        } catch (ServiceException e) {
+            logger.error("Unexpected execption: {}", e.getMessage());
         }
         return false;
     }

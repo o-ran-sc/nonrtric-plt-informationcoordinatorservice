@@ -568,7 +568,7 @@ paths:
       tags:
       - A1-EI (registration)
       summary: EI job status
-      operationId: getEiJobStatus_1
+      operationId: getEiJobStatus
       parameters:
       - name: eiJobId
         in: path
@@ -622,7 +622,7 @@ paths:
       tags:
       - Data consumer
       summary: Job status
-      operationId: getEiJobStatus
+      operationId: getInfoJobStatus
       parameters:
       - name: infoJobId
         in: path
@@ -860,7 +860,7 @@ paths:
       tags:
       - A1-EI (registration)
       summary: Individual EI job
-      operationId: getIndividualEiJob_1
+      operationId: getIndividualEiJob
       parameters:
       - name: eiJobId
         in: path
@@ -886,6 +886,9 @@ paths:
       tags:
       - A1-EI (registration)
       summary: Individual EI job
+      description: If the requested info_type_id is not found, an attempt to find
+        a compatible version is made. As an example, 'type_1.9.0' is backwards compatible
+        with 'type_1.0.0'
       operationId: putIndividualEiJob
       parameters:
       - name: eiJobId
@@ -936,7 +939,7 @@ paths:
       tags:
       - A1-EI (registration)
       summary: Individual EI job
-      operationId: deleteIndividualEiJob_1
+      operationId: deleteIndividualEiJob
       parameters:
       - name: eiJobId
         in: path
@@ -982,7 +985,7 @@ paths:
       tags:
       - Data consumer
       summary: Individual data subscription job
-      operationId: getIndividualEiJob
+      operationId: getIndividualInfoJob
       parameters:
       - name: infoJobId
         in: path
@@ -1008,7 +1011,9 @@ paths:
       tags:
       - Data consumer
       summary: Individual data subscription job
-      description: The job will be enabled when a producer is available
+      description: The job will be enabled when a producer is available. If the requested
+        info_type_id is not found, an attempt to find a compatible version is made.
+        As an example, 'type_1.9.0' is backwards compatible with 'type_1.0.0'
       operationId: putIndividualInfoJob
       parameters:
       - name: infoJobId
@@ -1059,7 +1064,7 @@ paths:
       tags:
       - Data consumer
       summary: Individual data subscription job
-      operationId: deleteIndividualEiJob
+      operationId: deleteIndividualInfoJob
       parameters:
       - name: infoJobId
         in: path
@@ -1096,7 +1101,7 @@ paths:
       parameters:
       - name: infoTypeId
         in: query
-        description: If given, only the producers for the EI Data type is returned.
+        description: If given, only the producers for the Info Type is returned.
         required: false
         style: form
         explode: true
