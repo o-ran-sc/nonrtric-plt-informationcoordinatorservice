@@ -20,45 +20,46 @@
 
 package org.oransc.ics.repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Vector;
+import java.util.Set;
 
 /**
- * A map, where each key can be bound to may values (where each value has an own
- * ID)
+ * A map, where each key can be bound to may values
  */
-public class MultiMap<T> {
+public class MultiMap<K, V> {
 
-    private final Map<String, Map<String, T>> map = new HashMap<>();
+    private final Map<K, Set<V>> map = new HashMap<>();
 
-    public void put(String key, String id, T value) {
-        this.map.computeIfAbsent(key, k -> new HashMap<>()).put(id, value);
+    public synchronized void put(K key, V value) {
+        this.map.computeIfAbsent(key, k -> new HashSet<>()).add(value);
     }
 
-    public T remove(String key, String id) {
-        Map<String, T> innerMap = this.map.get(key);
+    public synchronized void remove(String key, V id) {
+        Set<V> innerMap = this.map.get(key);
         if (innerMap != null) {
-            T removedElement = innerMap.remove(id);
+            innerMap.remove(id);
             if (innerMap.isEmpty()) {
                 this.map.remove(key);
             }
-            return removedElement;
         }
-        return null;
     }
 
-    public Collection<T> get(String key) {
-        Map<String, T> innerMap = this.map.get(key);
+    public synchronized Collection<V> get(K key) {
+        Set<V> innerMap = this.map.get(key);
         if (innerMap == null) {
             return Collections.emptyList();
         }
-        return new Vector<>(innerMap.values());
+        Collection<V> result = new ArrayList<>(innerMap.size());
+        result.addAll(innerMap);
+        return result;
     }
 
-    public void clear() {
+    public synchronized void clear() {
         this.map.clear();
     }
 

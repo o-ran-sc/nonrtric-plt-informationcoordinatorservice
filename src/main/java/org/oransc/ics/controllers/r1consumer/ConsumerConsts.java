@@ -33,7 +33,9 @@ public class ConsumerConsts {
 
     public static final String INDIVIDUAL_JOB = "Individual data subscription job";
 
-    public static final String PUT_INDIVIDUAL_JOB_DESCRIPTION = "The job will be enabled when a producer is available";
+    public static final String PUT_INDIVIDUAL_JOB_DESCRIPTION = "The job will be enabled when a producer is available. "
+        + "If the requested info_type_id is not found, an attempt to find a compatible version is made. " //
+        + "As an example, 'type_1.9.0' is backwards compatible with 'type_1.0.0'";
 
     public static final String INFO_TYPE_ID_PARAM = "infoTypeId";
     public static final String INFO_TYPE_ID_PARAM_DESCRIPTION =

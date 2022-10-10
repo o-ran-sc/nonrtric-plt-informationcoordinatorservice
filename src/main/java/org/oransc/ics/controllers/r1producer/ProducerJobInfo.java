@@ -73,7 +73,8 @@ public class ProducerJobInfo {
     }
 
     public ProducerJobInfo(InfoJob job) {
-        this(job.getJobData(), job.getId(), job.getTypeId(), job.getTargetUrl(), job.getOwner(), job.getLastUpdated());
+        this(job.getJobData(), job.getId(), job.getType().getId(), job.getTargetUrl(), job.getOwner(),
+            job.getLastUpdated());
     }
 
     public ProducerJobInfo() {

@@ -24,6 +24,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class InfoJob {
     private final String id;
 
     @Getter
-    private final String typeId;
+    private final InfoType type;
 
     @Getter
     private final String owner;
@@ -62,9 +63,47 @@ public class InfoJob {
     @Builder.Default
     private boolean isLastStatusReportedEnabled = true;
 
+    @Getter
+    @Builder
+    @EqualsAndHashCode
+    public static class PersistentData {
+        private String id;
+        private String typeId;
+        private String owner;
+        private Object jobData;
+        private String targetUrl;
+        private String jobStatusUrl;
+        private String lastUpdated;
+    }
+
     public void setLastReportedStatus(boolean isEnabled) {
         this.isLastStatusReportedEnabled = isEnabled;
         logger.debug("Job status id: {}, enabled: {}", this.isLastStatusReportedEnabled, isEnabled);
+    }
+
+    public PersistentData getPersistentData() {
+        return PersistentData.builder() //
+            .id(id) //
+            .jobData(jobData) //
+            .jobStatusUrl(jobStatusUrl) //
+            .owner(owner) //
+            .targetUrl(targetUrl) //
+            .typeId(type.getId()) //
+            .lastUpdated(lastUpdated) //
+            .build();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof InfoJob) {
+            return this.id.equals(((InfoJob) o).id);
+        }
+        return this.id.equals(o);
     }
 
 }

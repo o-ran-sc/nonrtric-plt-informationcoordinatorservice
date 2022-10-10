@@ -66,9 +66,9 @@ class BeanFactory {
     }
 
     @Bean
-    public InfoJobs infoJobs(SecurityContext securityContext) {
+    public InfoJobs infoJobs(SecurityContext securityContext, InfoTypes types) {
         if (infoJobs == null) {
-            infoJobs = new InfoJobs(getApplicationConfig(), producerCallbacks(securityContext));
+            infoJobs = new InfoJobs(getApplicationConfig(), types, producerCallbacks(securityContext));
             try {
                 infoJobs.restoreJobsFromDatabase();
             } catch (Exception e) {

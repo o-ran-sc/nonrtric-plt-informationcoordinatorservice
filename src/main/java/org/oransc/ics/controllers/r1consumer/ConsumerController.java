@@ -166,7 +166,7 @@ public class ConsumerController {
             List<String> result = new ArrayList<>();
             if (owner != null) {
                 for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
-                    if (infoTypeId == null || job.getTypeId().equals(infoTypeId)) {
+                    if (infoTypeId == null || job.getType().getId().equals(infoTypeId)) {
                         result.add(job.getId());
                     }
                 }
@@ -176,9 +176,7 @@ public class ConsumerController {
                 this.infoJobs.getJobs().forEach(job -> result.add(job.getId()));
             }
             return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
         }
     }
@@ -198,8 +196,7 @@ public class ConsumerController {
         @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = true) String owner) {
 
         for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
-
-            logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(), job.getTypeId(), owner);
+            logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(), job.getType().getId(), owner);
             this.infoJobs.remove(job, this.infoProducers);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -218,7 +215,7 @@ public class ConsumerController {
                 description = "Information subscription job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> getIndividualEiJob( //
+    public ResponseEntity<Object> getIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId) {
         try {
             logger.debug("GET info job, id: {}", infoJobId);
@@ -242,7 +239,7 @@ public class ConsumerController {
                 description = "Information subscription job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> getEiJobStatus( //
+    public ResponseEntity<Object> getInfoJobStatus( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId) {
         try {
             logger.debug("GET info job status, id: {}", jobId);
@@ -255,7 +252,8 @@ public class ConsumerController {
 
     private ConsumerJobStatus toInfoJobStatus(InfoJob job) {
         Collection<String> producerIds = new ArrayList<>();
-        this.infoProducers.getProducersForType(job.getTypeId()).forEach(producer -> producerIds.add(producer.getId()));
+        this.infoProducers.getProducersSupportingType(job.getType())
+            .forEach(producer -> producerIds.add(producer.getId()));
         return this.infoProducers.isJobEnabled(job)
             ? new ConsumerJobStatus(ConsumerJobStatus.InfoJobStatusValues.ENABLED, producerIds)
             : new ConsumerJobStatus(ConsumerJobStatus.InfoJobStatusValues.DISABLED, producerIds);
@@ -280,7 +278,7 @@ public class ConsumerController {
                 description = "Information subscription job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> deleteIndividualEiJob( //
+    public ResponseEntity<Object> deleteIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId) {
         try {
             logger.debug("DELETE info job, id: {}", jobId);
@@ -321,16 +319,17 @@ public class ConsumerController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class)))})
     public Mono<ResponseEntity<Object>> putIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId, //
-        @RequestBody ConsumerJobInfo informationJobObject) {
+        @RequestBody ConsumerJobInfo informationJobObject) throws ServiceException {
 
         final boolean isNewJob = this.infoJobs.get(jobId) == null;
 
         logger.debug("PUT info job, id: {}, obj: {}", jobId, informationJobObject);
+        InfoType infoType = this.infoTypes.getCompatibleType(informationJobObject.infoTypeId);
 
-        return validatePutInfoJob(jobId, informationJobObject) //
-            .flatMap(this::startInfoSubscriptionJob) //
+        return validatePutInfoJob(jobId, infoType, informationJobObject) //
+            .flatMap(job -> startInfoSubscriptionJob(job, infoType)) //
             .doOnNext(this.infoJobs::put) //
-            .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
+            .map(newJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
             .onErrorResume(throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.NOT_FOUND)));
     }
 
@@ -463,27 +462,28 @@ public class ConsumerController {
             .callbackUrl(s.statusResultUri).build();
     }
 
-    private Mono<InfoJob> startInfoSubscriptionJob(InfoJob newInfoJob) {
-        return this.producerCallbacks.startInfoSubscriptionJob(newInfoJob, infoProducers) //
+    private Mono<InfoJob> startInfoSubscriptionJob(InfoJob newInfoJob, InfoType type) {
+        return this.producerCallbacks.startInfoSubscriptionJob(newInfoJob, type, infoProducers) //
             .doOnNext(noOfAcceptingProducers -> this.logger.debug("Started job {}, number of activated producers: {}",
                 newInfoJob.getId(), noOfAcceptingProducers)) //
             .map(noOfAcceptingProducers -> newInfoJob);
     }
 
-    private Mono<InfoJob> validatePutInfoJob(String jobId, ConsumerJobInfo jobInfo) {
+    private Mono<InfoJob> validatePutInfoJob(String jobId, InfoType infoType, ConsumerJobInfo jobInfo) {
         try {
-
-            InfoType infoType = this.infoTypes.getType(jobInfo.infoTypeId);
             validateJsonObjectAgainstSchema(infoType.getJobDataSchema(), jobInfo.jobDefinition);
-
-            InfoJob existingEiJob = this.infoJobs.get(jobId);
             validateUri(jobInfo.statusNotificationUri);
             validateUri(jobInfo.jobResultUri);
 
-            if (existingEiJob != null && !existingEiJob.getTypeId().equals(jobInfo.infoTypeId)) {
-                throw new ServiceException("Not allowed to change type for existing job", HttpStatus.CONFLICT);
+            InfoJob existingJob = this.infoJobs.get(jobId);
+            if (existingJob != null) {
+                InfoType.TypeId typeId = InfoType.TypeId.ofString(jobInfo.infoTypeId);
+                if (!existingJob.getType().getId().contains(typeId.getName())) {
+                    throw new ServiceException("Not allowed to change type for existing job", HttpStatus.CONFLICT);
+                }
             }
-            return Mono.just(toEiJob(jobInfo, jobId, jobInfo.infoTypeId));
+
+            return Mono.just(toInfoJob(jobInfo, jobId, infoType));
         } catch (Exception e) {
             return Mono.error(e);
         }
@@ -514,10 +514,10 @@ public class ConsumerController {
         }
     }
 
-    private InfoJob toEiJob(ConsumerJobInfo info, String id, String typeId) {
+    private InfoJob toInfoJob(ConsumerJobInfo info, String id, InfoType type) {
         return InfoJob.builder() //
             .id(id) //
-            .typeId(typeId) //
+            .type(type) //
             .owner(info.owner) //
             .jobData(info.jobDefinition) //
             .targetUrl(info.jobResultUri) //
@@ -527,11 +527,11 @@ public class ConsumerController {
 
     private ConsumerInfoTypeInfo toInfoTypeInfo(InfoType type) {
         return new ConsumerInfoTypeInfo(type.getJobDataSchema(), typeStatus(type),
-            this.infoProducers.getProducerIdsForType(type.getId()).size());
+            this.infoProducers.getProducerIdsForType(type).size());
     }
 
     private ConsumerInfoTypeInfo.ConsumerTypeStatusValues typeStatus(InfoType type) {
-        for (InfoProducer producer : this.infoProducers.getProducersForType(type)) {
+        for (InfoProducer producer : this.infoProducers.getProducersSupportingType(type)) {
             if (producer.isAvailable()) {
                 return ConsumerInfoTypeInfo.ConsumerTypeStatusValues.ENABLED;
             }
@@ -539,7 +539,8 @@ public class ConsumerController {
         return ConsumerInfoTypeInfo.ConsumerTypeStatusValues.DISABLED;
     }
 
-    private ConsumerJobInfo toInfoJobInfo(InfoJob s) {
-        return new ConsumerJobInfo(s.getTypeId(), s.getJobData(), s.getOwner(), s.getTargetUrl(), s.getJobStatusUrl());
+    private ConsumerJobInfo toInfoJobInfo(InfoJob j) {
+        return new ConsumerJobInfo(j.getType().getId(), j.getJobData(), j.getOwner(), j.getTargetUrl(),
+            j.getJobStatusUrl());
     }
 }

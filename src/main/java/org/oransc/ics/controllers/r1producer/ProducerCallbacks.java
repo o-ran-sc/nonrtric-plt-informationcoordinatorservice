@@ -35,6 +35,7 @@ import org.oransc.ics.repository.InfoJob;
 import org.oransc.ics.repository.InfoJobs;
 import org.oransc.ics.repository.InfoProducer;
 import org.oransc.ics.repository.InfoProducers;
+import org.oransc.ics.repository.InfoType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class ProducerCallbacks {
     }
 
     public void stopInfoJob(InfoJob infoJob, InfoProducers infoProducers) {
-        for (InfoProducer producer : getProducersForJob(infoJob, infoProducers)) {
+        for (InfoProducer producer : getProducersForJob(infoJob.getType(), infoProducers)) {
             String url = producer.getJobCallbackUrl() + "/" + infoJob.getId();
             producer.setJobDisabled(infoJob);
             restClient.delete(url) //
@@ -81,9 +82,9 @@ public class ProducerCallbacks {
      * @param infoJob an Information Job
      * @return the number of producers that returned OK
      */
-    public Mono<Integer> startInfoSubscriptionJob(InfoJob infoJob, InfoProducers infoProducers) {
+    public Mono<Integer> startInfoSubscriptionJob(InfoJob infoJob, InfoType type, InfoProducers infoProducers) {
         Retry retrySpec = Retry.fixedDelay(1, Duration.ofSeconds(1));
-        return Flux.fromIterable(getProducersForJob(infoJob, infoProducers)) //
+        return Flux.fromIterable(getProducersForJob(type, infoProducers)) //
             .flatMap(infoProducer -> startInfoJob(infoProducer, infoJob, retrySpec)) //
             .collectList() //
             .map(okResponses -> Integer.valueOf(okResponses.size())); //
@@ -120,8 +121,8 @@ public class ProducerCallbacks {
             .doOnNext(resp -> producer.setJobEnabled(infoJob));
     }
 
-    private Collection<InfoProducer> getProducersForJob(InfoJob infoJob, InfoProducers infoProducers) {
-        return infoProducers.getProducersForType(infoJob.getTypeId());
+    private Collection<InfoProducer> getProducersForJob(InfoType type, InfoProducers infoProducers) {
+        return infoProducers.getProducersSupportingType(type);
     }
 
 }

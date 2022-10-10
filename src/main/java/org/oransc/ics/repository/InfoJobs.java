@@ -52,21 +52,23 @@ import org.springframework.util.FileSystemUtils;
 public class InfoJobs {
     private Map<String, InfoJob> allEiJobs = new HashMap<>();
 
-    private MultiMap<InfoJob> jobsByType = new MultiMap<>();
-    private MultiMap<InfoJob> jobsByOwner = new MultiMap<>();
+    private MultiMap<String, InfoJob> jobsByType = new MultiMap<>();
+    private MultiMap<String, InfoJob> jobsByOwner = new MultiMap<>();
     private final Gson gson;
+    private final InfoTypes infoTypes;
 
     private final ApplicationConfig config;
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ProducerCallbacks producerCallbacks;
 
-    public InfoJobs(ApplicationConfig config, ProducerCallbacks producerCallbacks) {
+    public InfoJobs(ApplicationConfig config, InfoTypes infoTypes, ProducerCallbacks producerCallbacks) {
         this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
         ServiceLoader.load(TypeAdapterFactory.class).forEach(gsonBuilder::registerTypeAdapterFactory);
         this.gson = gsonBuilder.create();
         this.producerCallbacks = producerCallbacks;
+        this.infoTypes = infoTypes;
     }
 
     public synchronized void restoreJobsFromDatabase() throws IOException {
@@ -75,9 +77,27 @@ public class InfoJobs {
 
         for (File file : dbDir.listFiles()) {
             String json = Files.readString(file.toPath());
-            InfoJob job = gson.fromJson(json, InfoJob.class);
-            this.doPut(job);
+            InfoJob.PersistentData data = gson.fromJson(json, InfoJob.PersistentData.class);
+            try {
+                InfoJob job = toInfoJob(data);
+                this.doPut(job);
+            } catch (ServiceException e) {
+                logger.warn("Could not restore job:{},reason: {}", data.getId(), e.getMessage());
+            }
         }
+    }
+
+    private InfoJob toInfoJob(InfoJob.PersistentData data) throws ServiceException {
+        InfoType type = infoTypes.getType(data.getTypeId());
+        return InfoJob.builder() //
+            .id(data.getId()) //
+            .type(type) //
+            .owner(data.getOwner()) //
+            .jobData(data.getJobData()) //
+            .targetUrl(data.getTargetUrl()) //
+            .jobStatusUrl(data.getJobStatusUrl()) //
+            .lastUpdated(data.getLastUpdated()) //
+            .build();
     }
 
     public synchronized void put(InfoJob job) {
@@ -123,8 +143,8 @@ public class InfoJobs {
 
     public synchronized void remove(InfoJob job, InfoProducers infoProducers) {
         this.allEiJobs.remove(job.getId());
-        jobsByType.remove(job.getTypeId(), job.getId());
-        jobsByOwner.remove(job.getOwner(), job.getId());
+        jobsByType.remove(job.getType().getId(), job);
+        jobsByOwner.remove(job.getOwner(), job);
 
         try {
             Files.delete(getPath(job));
@@ -132,6 +152,7 @@ public class InfoJobs {
             logger.warn("Could not remove file: {}", e.getMessage());
         }
         this.producerCallbacks.stopInfoJob(job, infoProducers);
+
     }
 
     public synchronized int size() {
@@ -156,14 +177,14 @@ public class InfoJobs {
 
     private void doPut(InfoJob job) {
         allEiJobs.put(job.getId(), job);
-        jobsByType.put(job.getTypeId(), job.getId(), job);
-        jobsByOwner.put(job.getOwner(), job.getId(), job);
+        jobsByType.put(job.getType().getId(), job);
+        jobsByOwner.put(job.getOwner(), job);
     }
 
     private void storeJobInFile(InfoJob job) {
         try {
             try (PrintStream out = new PrintStream(new FileOutputStream(getFile(job)))) {
-                out.print(gson.toJson(job));
+                out.print(gson.toJson(job.getPersistentData()));
             }
         } catch (Exception e) {
             logger.warn("Could not store job: {} {}", job.getId(), e.getMessage());

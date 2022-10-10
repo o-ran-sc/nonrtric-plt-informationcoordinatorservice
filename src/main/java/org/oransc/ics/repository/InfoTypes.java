@@ -51,7 +51,7 @@ import org.springframework.util.FileSystemUtils;
 @SuppressWarnings("squid:S2629") // Invoke method(s) only conditionally
 public class InfoTypes {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private final Map<String, InfoType> allEiTypes = new HashMap<>();
+    private final Map<String, InfoType> allInfoTypes = new HashMap<>();
     private final ApplicationConfig config;
     private final Gson gson;
 
@@ -68,22 +68,23 @@ public class InfoTypes {
 
         for (File file : dbDir.listFiles()) {
             String json = Files.readString(file.toPath());
-            InfoType type = gson.fromJson(json, InfoType.class);
-            allEiTypes.put(type.getId(), type);
+            InfoType.PersistentInfo storedData = gson.fromJson(json, InfoType.PersistentInfo.class);
+            InfoType type = new InfoType(storedData);
+            allInfoTypes.put(type.getId(), type);
         }
     }
 
     public synchronized void put(InfoType type) {
-        allEiTypes.put(type.getId(), type);
+        allInfoTypes.put(type.getId(), type);
         storeInFile(type);
     }
 
     public synchronized Collection<InfoType> getAllInfoTypes() {
-        return new Vector<>(allEiTypes.values());
+        return new Vector<>(allInfoTypes.values());
     }
 
     public synchronized InfoType getType(String id) throws ServiceException {
-        InfoType type = allEiTypes.get(id);
+        InfoType type = allInfoTypes.get(id);
         if (type == null) {
             throw new ServiceException("Information type not found: " + id, HttpStatus.NOT_FOUND);
         }
@@ -91,11 +92,11 @@ public class InfoTypes {
     }
 
     public synchronized InfoType get(String id) {
-        return allEiTypes.get(id);
+        return allInfoTypes.get(id);
     }
 
     public synchronized void remove(InfoType type) {
-        allEiTypes.remove(type.getId());
+        allInfoTypes.remove(type.getId());
         try {
             Files.delete(getPath(type));
         } catch (IOException e) {
@@ -104,12 +105,26 @@ public class InfoTypes {
     }
 
     public synchronized int size() {
-        return allEiTypes.size();
+        return allInfoTypes.size();
     }
 
     public synchronized void clear() {
-        this.allEiTypes.clear();
+        this.allInfoTypes.clear();
         clearDatabase();
+    }
+
+    public synchronized InfoType getCompatibleType(String typeId) throws ServiceException {
+        InfoType res = this.get(typeId);
+        if (res != null) {
+            return res;
+        }
+
+        Collection<InfoType> compatibleTypes =
+            InfoType.filterCompatibleWithVersion(this.getAllInfoTypes(), InfoType.TypeId.ofString(typeId));
+        if (compatibleTypes.isEmpty()) {
+            throw new ServiceException("Information type not found: " + typeId, HttpStatus.NOT_FOUND);
+        }
+        return compatibleTypes.iterator().next();
     }
 
     private void clearDatabase() {
@@ -124,7 +139,7 @@ public class InfoTypes {
     private void storeInFile(InfoType type) {
         try {
             try (PrintStream out = new PrintStream(new FileOutputStream(getFile(type)))) {
-                out.print(gson.toJson(type));
+                out.print(gson.toJson(type.getPersistentInfo()));
             }
         } catch (Exception e) {
             logger.warn("Could not save type: {} {}", type.getId(), e.getMessage());
