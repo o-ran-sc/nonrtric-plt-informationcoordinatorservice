@@ -20,7 +20,6 @@
 
 package org.oransc.ics.repository;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +30,7 @@ public class InfoProducer {
     private final String id;
 
     @Getter
-    private final Collection<InfoType> infoTypes;
+    private final Set<InfoType> infoTypes;
 
     @Getter
     private final String jobCallbackUrl;
@@ -43,7 +42,7 @@ public class InfoProducer {
 
     private int unresponsiveCounter = 0;
 
-    public InfoProducer(String id, Collection<InfoType> infoTypes, String jobCallbackUrl,
+    public InfoProducer(String id, Set<InfoType> infoTypes, String jobCallbackUrl,
         String producerSupervisionCallbackUrl) {
         this.id = id;
         this.infoTypes = infoTypes;
@@ -80,6 +79,19 @@ public class InfoProducer {
      */
     public synchronized boolean isJobEnabled(InfoJob job) {
         return this.enabledJobs.contains(job.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof InfoProducer) {
+            return this.id.equals(((InfoProducer) o).id);
+        }
+        return this.id.equals(o);
     }
 
 }

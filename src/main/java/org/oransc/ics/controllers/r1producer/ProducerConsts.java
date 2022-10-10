@@ -35,6 +35,8 @@ public class ProducerConsts {
 
     public static final String INFO_PRODUCER_ID_PATH = "infoProducerId";
 
+    public static final String DELETE_INFO_TYPE_DESCRPTION = "Existing jobs of the type will be automatically deleted.";
+
     private ProducerConsts() {
     }
 

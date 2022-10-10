@@ -35,6 +35,10 @@ public class A1eConsts {
     public static final String EI_TYPE_ID_PARAM = "eiTypeId";
     public static final String EI_TYPE_ID_PARAM_DESCRIPTION = "selects EI jobs of matching EI type";
 
+    public static final String PUT_INDIVIDUAL_JOB_DESCRIPTION =
+        "If the requested info_type_id is not found, an attempt to find a compatible version is made. " //
+            + "As an example, 'type_1.9.0' is backwards compatible with 'type_1.0.0'";
+
     private A1eConsts() {
     }
 }

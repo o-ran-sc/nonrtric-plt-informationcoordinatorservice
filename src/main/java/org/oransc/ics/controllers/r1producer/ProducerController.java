@@ -37,7 +37,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
@@ -45,6 +47,7 @@ import org.oransc.ics.exceptions.ServiceException;
 import org.oransc.ics.repository.InfoJob;
 import org.oransc.ics.repository.InfoJobs;
 import org.oransc.ics.repository.InfoProducer;
+import org.oransc.ics.repository.InfoProducerRegistrationInfo;
 import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoType;
 import org.oransc.ics.repository.InfoTypeSubscriptions;
@@ -167,7 +170,7 @@ public class ProducerController {
     @DeleteMapping(
         path = ProducerConsts.API_ROOT + "/info-types/{infoTypeId}",
         produces = MediaType.APPLICATION_JSON_VALUE) //
-    @Operation(summary = "Individual Information Type", description = "") //
+    @Operation(summary = "Individual Information Type", description = ProducerConsts.DELETE_INFO_TYPE_DESCRPTION) //
     @ApiResponses(
         value = { //
             @ApiResponse(
@@ -195,12 +198,13 @@ public class ProducerController {
         if (type == null) {
             return ErrorResponse.create("Information type not found", HttpStatus.NOT_FOUND);
         }
-        if (!this.infoProducers.getProducersForType(type).isEmpty()) {
-            String firstProducerId = this.infoProducers.getProducersForType(type).iterator().next().getId();
+        if (!this.infoProducers.getProducersSupportingType(type).isEmpty()) {
+            String firstProducerId = this.infoProducers.getProducersSupportingType(type).iterator().next().getId();
             return ErrorResponse.create("The type has active producers: " + firstProducerId, HttpStatus.CONFLICT);
         }
         this.infoTypes.remove(type);
-        infoJobs.getJobsForType(type).forEach(job -> infoJobs.remove(job, infoProducers)); // Delete jobs for the type
+        infoJobs.getJobsForType(type).forEach(job -> infoJobs.remove(job, infoProducers)); // Delete jobs for the
+                                                                                           // type
         this.typeSubscriptions.notifyTypeRemoved(type);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -218,17 +222,27 @@ public class ProducerController {
         @Parameter(
             name = ProducerConsts.INFO_TYPE_ID_PARAM,
             required = false,
-            description = "If given, only the producers for the EI Data type is returned.") //
+            description = "If given, only the producers for the Info Type is returned.") //
         @RequestParam(name = ProducerConsts.INFO_TYPE_ID_PARAM, required = false) String typeId //
-    ) {
+    ) throws ServiceException {
         logger.debug("GET producer identifiers");
         List<String> result = new ArrayList<>();
-        for (InfoProducer infoProducer : typeId == null ? this.infoProducers.getAllProducers()
-            : this.infoProducers.getProducersForType(typeId)) {
+        for (InfoProducer infoProducer : getProducers(typeId)) {
             result.add(infoProducer.getId());
         }
 
         return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
+    }
+
+    private Collection<InfoProducer> getProducers(String typeId) throws ServiceException {
+        if (typeId == null) {
+            return this.infoProducers.getAllProducers();
+        }
+        InfoType type = infoTypes.get(typeId);
+        if (type == null) {
+            return new ArrayList<>();
+        }
+        return infoProducers.getProducersSupportingType(infoTypes.getType(typeId));
     }
 
     @GetMapping(
@@ -422,15 +436,15 @@ public class ProducerController {
         return new ProducerInfoTypeInfo(t.getJobDataSchema(), t.getTypeSpecificInfo());
     }
 
-    private InfoProducers.InfoProducerRegistrationInfo toProducerRegistrationInfo(String infoProducerId,
+    private InfoProducerRegistrationInfo toProducerRegistrationInfo(String infoProducerId,
         ProducerRegistrationInfo info) throws ServiceException {
-        Collection<InfoType> supportedTypes = new ArrayList<>();
+        Set<InfoType> supportedTypes = new HashSet<>();
         for (String typeId : info.supportedTypeIds) {
             InfoType type = this.infoTypes.getType(typeId);
             supportedTypes.add(type);
         }
 
-        return InfoProducers.InfoProducerRegistrationInfo.builder() //
+        return InfoProducerRegistrationInfo.builder() //
             .id(infoProducerId) //
             .jobCallbackUrl(info.jobCallbackUrl) //
             .producerSupervisionCallbackUrl(info.producerSupervisionCallbackUrl) //

@@ -62,7 +62,7 @@ import reactor.util.retry.Retry;
 public class InfoTypeSubscriptions {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Map<String, SubscriptionInfo> allSubscriptions = new HashMap<>();
-    private final MultiMap<SubscriptionInfo> subscriptionsByOwner = new MultiMap<>();
+    private final MultiMap<String, SubscriptionInfo> subscriptionsByOwner = new MultiMap<>();
     private final Gson gson = new GsonBuilder().create();
     private final ApplicationConfig config;
     private final Map<String, ConsumerCallbackHandler> callbackHandlers = new HashMap<>();
@@ -83,6 +83,20 @@ public class InfoTypeSubscriptions {
         private String owner;
 
         private String apiVersion;
+
+        @Override
+        public int hashCode() {
+            return this.id.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof SubscriptionInfo) {
+                return this.id.equals(((SubscriptionInfo) o).id);
+            }
+            return this.id.equals(o);
+        }
+
     }
 
     public InfoTypeSubscriptions(@Autowired ApplicationConfig config) {
@@ -111,7 +125,7 @@ public class InfoTypeSubscriptions {
 
     /**
      * Get a subscription and throw if not fond.
-     * 
+     *
      * @param id the ID of the subscription to get.
      * @return SubscriptionInfo
      * @throws ServiceException if not found
@@ -127,7 +141,7 @@ public class InfoTypeSubscriptions {
     /**
      * Get a subscription or return null if not found. Equivalent to get in all java
      * collections.
-     * 
+     *
      * @param id the ID of the subscription to get.
      * @return SubscriptionInfo
      */
@@ -147,7 +161,7 @@ public class InfoTypeSubscriptions {
 
     public void remove(SubscriptionInfo subscription) {
         allSubscriptions.remove(subscription.getId());
-        subscriptionsByOwner.remove(subscription.owner, subscription.id);
+        subscriptionsByOwner.remove(subscription.owner, subscription);
 
         try {
             Files.delete(getPath(subscription));
@@ -214,7 +228,7 @@ public class InfoTypeSubscriptions {
     /**
      * Invoking one consumer. If the call fails after retries, the subscription is
      * removed.
-     * 
+     *
      * @param notifyFunc
      * @param subscriptionInfo
      * @return
@@ -265,7 +279,7 @@ public class InfoTypeSubscriptions {
 
     private void doPut(SubscriptionInfo subscription) {
         allSubscriptions.put(subscription.getId(), subscription);
-        subscriptionsByOwner.put(subscription.owner, subscription.id, subscription);
+        subscriptionsByOwner.put(subscription.owner, subscription);
     }
 
     private File getFile(SubscriptionInfo subscription) {
