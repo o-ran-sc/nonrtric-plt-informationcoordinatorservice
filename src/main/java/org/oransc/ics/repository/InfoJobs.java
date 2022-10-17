@@ -24,27 +24,24 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Vector;
 
 import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
+import org.oransc.ics.datastore.DataStore;
+import org.oransc.ics.datastore.FileStore;
+import org.oransc.ics.datastore.S3ObjectStore;
 import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.FileSystemUtils;
+import reactor.core.publisher.Flux;
 
 /**
  * Dynamic representation of all existing Information Jobs.
@@ -62,6 +59,8 @@ public class InfoJobs {
 
     private final ProducerCallbacks producerCallbacks;
 
+    private final DataStore dataStore;
+
     public InfoJobs(ApplicationConfig config, InfoTypes infoTypes, ProducerCallbacks producerCallbacks) {
         this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -69,40 +68,48 @@ public class InfoJobs {
         this.gson = gsonBuilder.create();
         this.producerCallbacks = producerCallbacks;
         this.infoTypes = infoTypes;
+        this.dataStore =
+            config.isS3Enabled() ? new S3ObjectStore(config, "infojobs") : new FileStore(config, "infojobs");
+        this.dataStore.createDataStore().subscribe();
     }
 
-    public synchronized void restoreJobsFromDatabase() throws IOException {
-        Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        File dbDir = new File(getDatabaseDirectory());
+    public synchronized Flux<InfoJob> restoreJobsFromDatabase() {
+        return dataStore.listObjects("") //
+            .flatMap(dataStore::readObject) //
+            .map(this::toPersistentData) //
+            .map(this::toInfoJob) //
+            .filter(Objects::nonNull) //
+            .doOnNext(this::doPut) //
+            .doOnError(t -> logger.error("Could not restore jobs from datastore, reason: {}", t.getMessage()));
+    }
 
-        for (File file : dbDir.listFiles()) {
-            String json = Files.readString(file.toPath());
-            InfoJob.PersistentData data = gson.fromJson(json, InfoJob.PersistentData.class);
-            try {
-                InfoJob job = toInfoJob(data);
-                this.doPut(job);
-            } catch (ServiceException e) {
-                logger.warn("Could not restore job:{},reason: {}", data.getId(), e.getMessage());
-            }
+    private InfoJob.PersistentData toPersistentData(byte[] bytes) {
+        String json = new String(bytes);
+        return gson.fromJson(json, InfoJob.PersistentData.class);
+    }
+
+    private InfoJob toInfoJob(InfoJob.PersistentData data) {
+        InfoType type;
+        try {
+            type = infoTypes.getType(data.getTypeId());
+            return InfoJob.builder() //
+                .id(data.getId()) //
+                .type(type) //
+                .owner(data.getOwner()) //
+                .jobData(data.getJobData()) //
+                .targetUrl(data.getTargetUrl()) //
+                .jobStatusUrl(data.getJobStatusUrl()) //
+                .lastUpdated(data.getLastUpdated()) //
+                .build();
+        } catch (ServiceException e) {
+            logger.error("Error restoring info job: {}, reason: {}", data.getId(), e.getMessage());
         }
-    }
-
-    private InfoJob toInfoJob(InfoJob.PersistentData data) throws ServiceException {
-        InfoType type = infoTypes.getType(data.getTypeId());
-        return InfoJob.builder() //
-            .id(data.getId()) //
-            .type(type) //
-            .owner(data.getOwner()) //
-            .jobData(data.getJobData()) //
-            .targetUrl(data.getTargetUrl()) //
-            .jobStatusUrl(data.getJobStatusUrl()) //
-            .lastUpdated(data.getLastUpdated()) //
-            .build();
+        return null;
     }
 
     public synchronized void put(InfoJob job) {
         this.doPut(job);
-        storeJobInFile(job);
+        storeJob(job);
     }
 
     public synchronized Collection<InfoJob> getJobs() {
@@ -146,11 +153,8 @@ public class InfoJobs {
         jobsByType.remove(job.getType().getId(), job);
         jobsByOwner.remove(job.getOwner(), job);
 
-        try {
-            Files.delete(getPath(job));
-        } catch (IOException e) {
-            logger.warn("Could not remove file: {}", e.getMessage());
-        }
+        this.dataStore.deleteObject(getPath(job)).subscribe();
+
         this.producerCallbacks.stopInfoJob(job, infoProducers);
 
     }
@@ -163,16 +167,8 @@ public class InfoJobs {
         this.allEiJobs.clear();
         this.jobsByType.clear();
         jobsByOwner.clear();
-        clearDatabase();
-    }
 
-    private void clearDatabase() {
-        try {
-            FileSystemUtils.deleteRecursively(Path.of(getDatabaseDirectory()));
-            Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        } catch (IOException e) {
-            logger.warn("Could not delete database : {}", e.getMessage());
-        }
+        dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).block();
     }
 
     private void doPut(InfoJob job) {
@@ -181,26 +177,16 @@ public class InfoJobs {
         jobsByOwner.put(job.getOwner(), job);
     }
 
-    private void storeJobInFile(InfoJob job) {
-        try {
-            try (PrintStream out = new PrintStream(new FileOutputStream(getFile(job)))) {
-                out.print(gson.toJson(job.getPersistentData()));
-            }
-        } catch (Exception e) {
-            logger.warn("Could not store job: {} {}", job.getId(), e.getMessage());
-        }
+    private void storeJob(InfoJob job) {
+        String json = gson.toJson(job.getPersistentData());
+        byte[] bytes = json.getBytes();
+        this.dataStore.writeObject(this.getPath(job), bytes) //
+            .doOnError(t -> logger.error("Could not store job in datastore, reason: {}", t.getMessage())) //
+            .subscribe();
     }
 
-    private File getFile(InfoJob job) {
-        return getPath(job).toFile();
-    }
-
-    private Path getPath(InfoJob job) {
-        return Path.of(getDatabaseDirectory(), job.getId());
-    }
-
-    private String getDatabaseDirectory() {
-        return config.getVardataDirectory() + "/database/eijobs";
+    private String getPath(InfoJob job) {
+        return job.getId();
     }
 
 }
