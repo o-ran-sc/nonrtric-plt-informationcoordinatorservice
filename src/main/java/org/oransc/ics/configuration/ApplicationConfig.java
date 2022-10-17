@@ -66,6 +66,22 @@ public class ApplicationConfig {
     @Value("${app.webclient.http.proxy-port:0}")
     private int httpProxyPort = 0;
 
+    @Getter
+    @Value("${app.s3.endpointOverride:}")
+    private String s3EndpointOverride;
+
+    @Getter
+    @Value("${app.s3.accessKeyId:}")
+    private String s3AccessKeyId;
+
+    @Getter
+    @Value("${app.s3.secretAccessKey:}")
+    private String s3SecretAccessKey;
+
+    @Getter
+    @Value("${app.s3.bucket:}")
+    private String s3Bucket;
+
     private WebClientConfig webClientConfig = null;
 
     public WebClientConfig getWebClientConfig() {
@@ -91,6 +107,10 @@ public class ApplicationConfig {
                 .build();
         }
         return this.webClientConfig;
+    }
+
+    public boolean isS3Enabled() {
+        return !(s3EndpointOverride.isBlank() || s3Bucket.isBlank());
     }
 
 }

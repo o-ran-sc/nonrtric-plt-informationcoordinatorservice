@@ -135,9 +135,8 @@ public class InfoProducers {
     }
 
     public synchronized boolean isJobEnabled(InfoJob job) {
-        InfoType type;
         try {
-            type = this.infoTypes.getType(job.getType().getId());
+            InfoType type = this.infoTypes.getType(job.getType().getId());
 
             for (InfoProducer producer : this.getProducersSupportingType(type)) {
                 if (producer.isJobEnabled(job)) {
