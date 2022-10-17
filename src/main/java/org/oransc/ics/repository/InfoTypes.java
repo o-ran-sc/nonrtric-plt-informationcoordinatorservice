@@ -24,26 +24,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Vector;
 
 import org.oransc.ics.configuration.ApplicationConfig;
+import org.oransc.ics.datastore.DataStore;
+import org.oransc.ics.datastore.FileStore;
+import org.oransc.ics.datastore.S3ObjectStore;
 import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.FileSystemUtils;
+import reactor.core.publisher.Flux;
 
 /**
  * Dynamic representation of all Information Types in the system.
@@ -54,24 +51,31 @@ public class InfoTypes {
     private final Map<String, InfoType> allInfoTypes = new HashMap<>();
     private final ApplicationConfig config;
     private final Gson gson;
+    private final DataStore dataStore;
 
     public InfoTypes(ApplicationConfig config) {
         this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
         ServiceLoader.load(TypeAdapterFactory.class).forEach(gsonBuilder::registerTypeAdapterFactory);
         this.gson = gsonBuilder.create();
+
+        this.dataStore =
+            config.isS3Enabled() ? new S3ObjectStore(config, "infotypes") : new FileStore(config, "infotypes");
+        this.dataStore.create().subscribe();
     }
 
-    public synchronized void restoreTypesFromDatabase() throws IOException {
-        Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        File dbDir = new File(getDatabaseDirectory());
+    public synchronized Flux<InfoType> restoreTypesFromDatabase() {
+        return dataStore.listObjects("") //
+            .flatMap(dataStore::readObject) //
+            .map(this::toInfoType) //
+            .filter(Objects::nonNull) //
+            .doOnNext(type -> allInfoTypes.put(type.getId(), type)) //
+            .doOnError(t -> logger.error("Could not restoore types from S3, reason: {}", t.getMessage()));
+    }
 
-        for (File file : dbDir.listFiles()) {
-            String json = Files.readString(file.toPath());
-            InfoType.PersistentInfo storedData = gson.fromJson(json, InfoType.PersistentInfo.class);
-            InfoType type = new InfoType(storedData);
-            allInfoTypes.put(type.getId(), type);
-        }
+    private InfoType toInfoType(byte[] bytes) {
+        String json = new String(bytes);
+        return gson.fromJson(json, InfoType.class);
     }
 
     public synchronized void put(InfoType type) {
@@ -97,11 +101,7 @@ public class InfoTypes {
 
     public synchronized void remove(InfoType type) {
         allInfoTypes.remove(type.getId());
-        try {
-            Files.delete(getPath(type));
-        } catch (IOException e) {
-            logger.warn("Could not remove file: {} {}", type.getId(), e.getMessage());
-        }
+        dataStore.deleteObject(getPath(type)).block();
     }
 
     public synchronized int size() {
@@ -110,7 +110,7 @@ public class InfoTypes {
 
     public synchronized void clear() {
         this.allInfoTypes.clear();
-        clearDatabase();
+        dataStore.delete().flatMap(s -> dataStore.create()).block();
     }
 
     public synchronized InfoType getCompatibleType(String typeId) throws ServiceException {
@@ -127,38 +127,15 @@ public class InfoTypes {
         return compatibleTypes.iterator().next();
     }
 
-    private void clearDatabase() {
-        try {
-            FileSystemUtils.deleteRecursively(Path.of(getDatabaseDirectory()));
-            Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        } catch (IOException e) {
-            logger.warn("Could not delete database : {}", e.getMessage());
-        }
-    }
-
     private void storeInFile(InfoType type) {
-        try {
-            try (PrintStream out = new PrintStream(new FileOutputStream(getFile(type)))) {
-                out.print(gson.toJson(type.getPersistentInfo()));
-            }
-        } catch (Exception e) {
-            logger.warn("Could not save type: {} {}", type.getId(), e.getMessage());
-        }
+        String json = gson.toJson(type);
+        byte[] bytes = json.getBytes();
+        this.dataStore.writeObject(this.getPath(type), bytes)
+            .doOnError(t -> logger.error("Could not store infotype in S3, reason: {}", t.getMessage())) //
+            .subscribe();
     }
 
-    private File getFile(InfoType type) {
-        return getPath(type).toFile();
-    }
-
-    private Path getPath(InfoType type) {
-        return getPath(type.getId());
-    }
-
-    private Path getPath(String typeId) {
-        return Path.of(getDatabaseDirectory(), typeId);
-    }
-
-    private String getDatabaseDirectory() {
-        return config.getVardataDirectory() + "/database/eitypes";
+    private String getPath(InfoType type) {
+        return type.getId();
     }
 }
