@@ -67,3 +67,9 @@ app:
   vardata-directory: /var/information-coordinator-service
   # If the file name is empty, no authorization token is used
   auth-token-file:
+  # S3 object store usage is enabled by defining the bucket to use. This will override the vardata-directory parameter.
+  s3:
+    endpointOverride: http://localhost:9000
+    accessKeyId: minio
+    secretAccessKey: miniostorage
+    bucket:
