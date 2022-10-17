@@ -103,7 +103,9 @@ import reactor.test.StepVerifier;
         "server.ssl.key-store=./config/keystore.jks", //
         "app.webclient.trust-store=./config/truststore.jks", //
         "app.webclient.trust-store-used=true", //
-        "app.vardata-directory=./target"})
+        "app.vardata-directory=/tmp/ics", //
+        "app.s3.bucket=" // If this is set, S3 will be used to store data.
+    })
 class ApplicationTest {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -989,12 +991,11 @@ class ApplicationTest {
         putInfoJob(TYPE_ID, "jobId2");
 
         assertThat(this.infoJobs.size()).isEqualTo(2);
-
         {
             InfoJob savedJob = this.infoJobs.getJob("jobId1");
             // Restore the jobs
             InfoJobs jobs = new InfoJobs(this.applicationConfig, this.infoTypes, this.producerCallbacks);
-            jobs.restoreJobsFromDatabase();
+            jobs.restoreJobsFromDatabase().blockLast();
             assertThat(jobs.size()).isEqualTo(2);
             InfoJob restoredJob = jobs.getJob("jobId1");
             assertThat(restoredJob.getPersistentData()).isEqualTo(savedJob.getPersistentData());
@@ -1007,7 +1008,7 @@ class ApplicationTest {
         {
             // Restore the jobs, no jobs in database
             InfoJobs jobs = new InfoJobs(this.applicationConfig, this.infoTypes, this.producerCallbacks);
-            jobs.restoreJobsFromDatabase();
+            jobs.restoreJobsFromDatabase().blockLast();
             assertThat(jobs.size()).isZero();
         }
         logger.warn("Test removing a job when the db file is gone");
@@ -1028,7 +1029,7 @@ class ApplicationTest {
         {
             // Restore the types
             InfoTypes restoredTypes = new InfoTypes(this.applicationConfig);
-            restoredTypes.restoreTypesFromDatabase();
+            restoredTypes.restoreTypesFromDatabase().blockLast();
             InfoType restoredType = restoredTypes.getType(TYPE_ID);
             assertThat(restoredType.getPersistentInfo()).isEqualTo(savedType.getPersistentInfo());
             assertThat(restoredTypes.size()).isEqualTo(1);
@@ -1037,7 +1038,7 @@ class ApplicationTest {
             // Restore the jobs, no jobs in database
             InfoTypes restoredTypes = new InfoTypes(this.applicationConfig);
             restoredTypes.clear();
-            restoredTypes.restoreTypesFromDatabase();
+            restoredTypes.restoreTypesFromDatabase().blockLast();
             assertThat(restoredTypes.size()).isZero();
         }
         logger.warn("Test removing a job when the db file is gone");
@@ -1046,7 +1047,7 @@ class ApplicationTest {
     }
 
     @Test
-    void testConsumerTypeSubscriptionDatabase() {
+    void testConsumerTypeSubscriptionDatabase() throws Exception {
         final String callbackUrl = baseUrl() + ConsumerSimulatorController.getTypeStatusCallbackUrl();
         final ConsumerTypeSubscriptionInfo info = new ConsumerTypeSubscriptionInfo(callbackUrl, "owner");
 
@@ -1055,7 +1056,9 @@ class ApplicationTest {
         restClient().putForEntity(typeSubscriptionUrl() + "/subscriptionId", body).block();
         assertThat(this.infoTypeSubscriptions.size()).isEqualTo(1);
 
+        Thread.sleep(1000); // Storing in S3 is asynch, so it can take some millis
         InfoTypeSubscriptions restoredSubscriptions = new InfoTypeSubscriptions(this.applicationConfig);
+        restoredSubscriptions.restoreFromDatabase().blockLast();
         assertThat(restoredSubscriptions.size()).isEqualTo(1);
         assertThat(restoredSubscriptions.getSubscriptionsForOwner("owner")).hasSize(1);
 

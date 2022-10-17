@@ -23,18 +23,12 @@ package org.oransc.ics.repository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.function.Function;
 
@@ -42,13 +36,15 @@ import lombok.Builder;
 import lombok.Getter;
 
 import org.oransc.ics.configuration.ApplicationConfig;
+import org.oransc.ics.datastore.DataStore;
+import org.oransc.ics.datastore.FileStore;
+import org.oransc.ics.datastore.S3ObjectStore;
 import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.FileSystemUtils;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -66,6 +62,7 @@ public class InfoTypeSubscriptions {
     private final Gson gson = new GsonBuilder().create();
     private final ApplicationConfig config;
     private final Map<String, ConsumerCallbackHandler> callbackHandlers = new HashMap<>();
+    private final DataStore dataStore;
 
     public interface ConsumerCallbackHandler {
         Mono<String> notifyTypeRegistered(InfoType type, SubscriptionInfo subscriptionInfo);
@@ -96,17 +93,13 @@ public class InfoTypeSubscriptions {
             }
             return this.id.equals(o);
         }
-
     }
 
     public InfoTypeSubscriptions(@Autowired ApplicationConfig config) {
         this.config = config;
-
-        try {
-            this.restoreFromDatabase();
-        } catch (IOException e) {
-            logger.error("Could not restore info type subscriptions from database {}", this.getDatabaseDirectory());
-        }
+        this.dataStore = config.isS3Enabled() ? new S3ObjectStore(config, "infotypesubscriptions")
+            : new FileStore(config, "infotypesubscriptions");
+        this.dataStore.createDataStore().subscribe();
     }
 
     public void registerCallbackhandler(ConsumerCallbackHandler handler, String apiVersion) {
@@ -162,12 +155,7 @@ public class InfoTypeSubscriptions {
     public void remove(SubscriptionInfo subscription) {
         allSubscriptions.remove(subscription.getId());
         subscriptionsByOwner.remove(subscription.owner, subscription);
-
-        try {
-            Files.delete(getPath(subscription));
-        } catch (Exception e) {
-            logger.debug("Could not delete subscription from database: {}", e.getMessage());
-        }
+        dataStore.deleteObject(getPath(subscription)).subscribe();
 
         logger.debug("Removed type status subscription {}", subscription.id);
     }
@@ -247,34 +235,28 @@ public class InfoTypeSubscriptions {
     }
 
     private void clearDatabase() {
-        try {
-            FileSystemUtils.deleteRecursively(Path.of(getDatabaseDirectory()));
-            Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        } catch (IOException e) {
-            logger.warn("Could not delete database : {}", e.getMessage());
-        }
+        this.dataStore.deleteAllData().block();
     }
 
     private void storeInFile(SubscriptionInfo subscription) {
-        try {
-            try (PrintStream out = new PrintStream(new FileOutputStream(getFile(subscription)))) {
-                String json = gson.toJson(subscription);
-                out.print(json);
-            }
-        } catch (Exception e) {
-            logger.warn("Could not save subscription: {} {}", subscription.getId(), e.getMessage());
-        }
+        String json = gson.toJson(subscription);
+        byte[] bytes = json.getBytes();
+        this.dataStore.writeObject(this.getPath(subscription), bytes)
+            .doOnError(t -> logger.error("Could not store infotype subscription, reason: {}", t.getMessage())) //
+            .subscribe();
     }
 
-    public synchronized void restoreFromDatabase() throws IOException {
-        Files.createDirectories(Paths.get(getDatabaseDirectory()));
-        File dbDir = new File(getDatabaseDirectory());
+    public synchronized Flux<SubscriptionInfo> restoreFromDatabase() {
+        return dataStore.listObjects("") //
+            .flatMap(dataStore::readObject) //
+            .map(this::toSubscriptionInfo) //
+            .filter(Objects::nonNull) //
+            .doOnNext(this::doPut);//
+    }
 
-        for (File file : dbDir.listFiles()) {
-            String json = Files.readString(file.toPath());
-            SubscriptionInfo subscription = gson.fromJson(json, SubscriptionInfo.class);
-            doPut(subscription);
-        }
+    private SubscriptionInfo toSubscriptionInfo(byte[] bytes) {
+        String json = new String(bytes);
+        return gson.fromJson(json, SubscriptionInfo.class);
     }
 
     private void doPut(SubscriptionInfo subscription) {
@@ -282,20 +264,8 @@ public class InfoTypeSubscriptions {
         subscriptionsByOwner.put(subscription.owner, subscription);
     }
 
-    private File getFile(SubscriptionInfo subscription) {
-        return getPath(subscription).toFile();
-    }
-
-    private Path getPath(SubscriptionInfo subscription) {
-        return getPath(subscription.getId());
-    }
-
-    private Path getPath(String subscriptionId) {
-        return Path.of(getDatabaseDirectory(), subscriptionId);
-    }
-
-    private String getDatabaseDirectory() {
-        return config.getVardataDirectory() + "/database/infotypesubscriptions";
+    private String getPath(SubscriptionInfo subscription) {
+        return subscription.getId();
     }
 
 }
