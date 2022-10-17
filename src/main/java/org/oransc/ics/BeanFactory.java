@@ -29,6 +29,7 @@ import org.oransc.ics.clients.SecurityContext;
 import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.repository.InfoJobs;
+import org.oransc.ics.repository.InfoTypeSubscriptions;
 import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +70,7 @@ class BeanFactory {
     public InfoJobs infoJobs(SecurityContext securityContext, InfoTypes types) {
         if (infoJobs == null) {
             infoJobs = new InfoJobs(getApplicationConfig(), types, producerCallbacks(securityContext));
-            try {
-                infoJobs.restoreJobsFromDatabase();
-            } catch (Exception e) {
-                logger.error("Could not restore jobs from database: {}", e.getMessage());
-            }
+            infoJobs.restoreJobsFromDatabase().subscribe();
         }
         return infoJobs;
     }
@@ -83,12 +80,19 @@ class BeanFactory {
         if (this.infoTypes == null) {
             infoTypes = new InfoTypes(getApplicationConfig());
             try {
-                infoTypes.restoreTypesFromDatabase();
+                infoTypes.restoreTypesFromDatabase().blockLast();
             } catch (Exception e) {
                 logger.error("Could not restore Information Types from database: {}", e.getMessage());
             }
         }
         return infoTypes;
+    }
+
+    @Bean
+    public InfoTypeSubscriptions infoTypeSubscriptions() {
+        InfoTypeSubscriptions s = new InfoTypeSubscriptions(getApplicationConfig());
+        s.restoreFromDatabase().subscribe();
+        return s;
     }
 
     @Bean

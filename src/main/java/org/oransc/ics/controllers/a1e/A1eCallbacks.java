@@ -73,9 +73,9 @@ public class A1eCallbacks {
 
     private Mono<String> noifyStatusToJobOwner(InfoJob job, InfoProducers eiProducers) {
         boolean isJobEnabled = eiProducers.isJobEnabled(job);
-        A1eEiJobStatus status = isJobEnabled ? new A1eEiJobStatus(A1eEiJobStatus.EiJobStatusValues.ENABLED)
+        A1eEiJobStatus jobStatus = isJobEnabled ? new A1eEiJobStatus(A1eEiJobStatus.EiJobStatusValues.ENABLED)
             : new A1eEiJobStatus(A1eEiJobStatus.EiJobStatusValues.DISABLED);
-        String body = gson.toJson(status);
+        String body = gson.toJson(jobStatus);
         return this.restClient.post(job.getJobStatusUrl(), body) //
             .doOnNext(response -> logger.debug("Consumer notified OK {}", job.getId())) //
             .doOnNext(response -> job.setLastReportedStatus(isJobEnabled)) //
