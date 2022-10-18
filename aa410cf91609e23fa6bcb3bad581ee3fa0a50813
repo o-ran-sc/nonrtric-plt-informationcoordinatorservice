@@ -177,6 +177,30 @@
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "778ec471_9ac6bcd3",
+        "filename": "src/main/java/org/oransc/ics/datastore/S3ObjectStore.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T14:54:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "023ece07_e3b36e28",
+      "range": {
+        "startLine": 172,
+        "startChar": 21,
+        "endLine": 172,
+        "endChar": 25
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ccf4609_e2482cc5",
@@ -666,6 +690,24 @@
       "side": 1,
       "message": "No, there is no condition.",
       "parentUuid": "9dc3edbc_a66572b0",
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b57d2a9_693f19fe",
+        "filename": "src/test/java/org/oransc/ics/ApplicationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T14:54:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "14f5ebe0_46867c82",
       "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
