@@ -1,0 +1,308 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9009494_be938be1",
+        "filename": "src/main/java/org/oransc/ics/datastore/DataStore.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "Maybe clearer to call this \"createDataStore\"?",
+      "range": {
+        "startLine": 36,
+        "startChar": 24,
+        "endLine": 36,
+        "endChar": 30
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99253b2e_401e3de2",
+        "filename": "src/main/java/org/oransc/ics/datastore/DataStore.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "Maybe clearer to call this \"deleteAll\" or \"deleteAllData\"?",
+      "range": {
+        "startLine": 38,
+        "startChar": 24,
+        "endLine": 38,
+        "endChar": 30
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "588af196_f6bbdb4f",
+        "filename": "src/main/java/org/oransc/ics/datastore/S3ObjectStore.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "Please remove commented out code",
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e30b0de_d52e7ae3",
+        "filename": "src/main/java/org/oransc/ics/datastore/S3ObjectStore.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "Where does this number come from? What happens if there are more items in the bucket than this number? Or maybe that is very unlikely?",
+      "range": {
+        "startLine": 172,
+        "startChar": 21,
+        "endLine": 172,
+        "endChar": 25
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ccf4609_e2482cc5",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoJobs.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "restore?",
+      "range": {
+        "startLine": 83,
+        "startChar": 52,
+        "endLine": 83,
+        "endChar": 58
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "314f703f_3d472a75",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoJobs.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "info jobs",
+      "range": {
+        "startLine": 83,
+        "startChar": 58,
+        "endLine": 83,
+        "endChar": 64
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c67430de_e0cbaca2",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoJobs.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "This operates on DataStore, so it could be a FileStore also? Maybe better to say \"data store\" instead?",
+      "range": {
+        "startLine": 83,
+        "startChar": 69,
+        "endLine": 83,
+        "endChar": 71
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6b66c39_ff2c6cc2",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoJobs.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "This operates on DataStore, so it could be a FileStore also? Maybe better to say \"data store\" instead?",
+      "range": {
+        "startLine": 184,
+        "startChar": 65,
+        "endLine": 184,
+        "endChar": 67
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1059a921_9e5bc835",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoTypeSubscriptions.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "This operates on DataStore, so it could be a FileStore also? Maybe better to say \"data store\" instead?",
+      "range": {
+        "startLine": 245,
+        "startChar": 83,
+        "endLine": 245,
+        "endChar": 85
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "202e8ad6_d0f5bd1a",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoTypes.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "This operates on DataStore, so it could be a FileStore also? Maybe better to say \"data store\" instead?",
+      "range": {
+        "startLine": 73,
+        "startChar": 72,
+        "endLine": 73,
+        "endChar": 74
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3876ba57_0fa1e56b",
+        "filename": "src/main/java/org/oransc/ics/repository/InfoTypes.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "restore",
+      "range": {
+        "startLine": 73,
+        "startChar": 52,
+        "endLine": 73,
+        "endChar": 61
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27a2cf06_5a60523c",
+        "filename": "src/test/java/org/oransc/ics/ApplicationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "This test only tests one of the data store types. It would be good if both types are tested.",
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dc3edbc_a66572b0",
+        "filename": "src/test/java/org/oransc/ics/ApplicationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "Can you use som variant of await instead of sleeping?",
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87b8f870_9a9fd025",
+        "filename": "src/test/java/org/oransc/ics/ApplicationTest.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 1000201
+      },
+      "writtenOn": "2022-10-18T07:07:30Z",
+      "side": 1,
+      "message": "In the TestPropertySource defined above the app.s3.bucket is empty, so is S3 actually used in this test?",
+      "range": {
+        "startLine": 1059,
+        "startChar": 42,
+        "endLine": 1059,
+        "endChar": 45
+      },
+      "revId": "aa410cf91609e23fa6bcb3bad581ee3fa0a50813",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
