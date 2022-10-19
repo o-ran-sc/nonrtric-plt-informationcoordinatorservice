@@ -37,7 +37,7 @@ public interface DataStore {
 
     public Mono<String> createDataStore();
 
-    public Mono<String> deleteAllData();
+    public Flux<String> deleteAllData();
 
     public Mono<String> deleteBucket();
 

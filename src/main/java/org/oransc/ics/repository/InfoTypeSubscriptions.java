@@ -58,7 +58,6 @@ public class InfoTypeSubscriptions {
     private final Map<String, SubscriptionInfo> allSubscriptions = new HashMap<>();
     private final MultiMap<String, SubscriptionInfo> subscriptionsByOwner = new MultiMap<>();
     private final Gson gson = new GsonBuilder().create();
-    private final ApplicationConfig config;
     private final Map<String, ConsumerCallbackHandler> callbackHandlers = new HashMap<>();
     private final DataStore dataStore;
 
@@ -94,7 +93,6 @@ public class InfoTypeSubscriptions {
     }
 
     public InfoTypeSubscriptions(@Autowired ApplicationConfig config) {
-        this.config = config;
         this.dataStore = DataStore.create(config, "infotypesubscriptions");
         this.dataStore.createDataStore().subscribe();
     }
@@ -232,7 +230,7 @@ public class InfoTypeSubscriptions {
     }
 
     private void clearDatabase() {
-        this.dataStore.deleteAllData().block();
+        this.dataStore.deleteAllData().blockLast();
     }
 
     private void storeInFile(SubscriptionInfo subscription) {

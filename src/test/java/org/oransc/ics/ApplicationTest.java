@@ -1011,6 +1011,7 @@ class ApplicationTest {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
         putInfoJob(TYPE_ID, "jobId1");
         putInfoJob(TYPE_ID, "jobId2");
+        waitForS3();
 
         assertThat(this.infoJobs.size()).isEqualTo(2);
         {
@@ -1046,6 +1047,7 @@ class ApplicationTest {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
         InfoType savedType = this.infoTypes.getType(TYPE_ID);
 
+        waitForS3();
         assertThat(this.infoTypes.size()).isEqualTo(1);
 
         {
@@ -1078,9 +1080,8 @@ class ApplicationTest {
         restClient().putForEntity(typeSubscriptionUrl() + "/subscriptionId", body).block();
         assertThat(this.infoTypeSubscriptions.size()).isEqualTo(1);
 
-        if (this.applicationConfig.isS3Enabled()) {
-            Thread.sleep(1000); // Storing in S3 is asynch, so it can take some millis
-        }
+        waitForS3();
+
         InfoTypeSubscriptions restoredSubscriptions = new InfoTypeSubscriptions(this.applicationConfig);
         restoredSubscriptions.restoreFromDatabase().blockLast();
         assertThat(restoredSubscriptions.size()).isEqualTo(1);
@@ -1090,6 +1091,13 @@ class ApplicationTest {
         restClient().deleteForEntity(typeSubscriptionUrl() + "/subscriptionId").block();
         restoredSubscriptions = new InfoTypeSubscriptions(this.applicationConfig);
         assertThat(restoredSubscriptions.size()).isZero();
+    }
+
+    @SuppressWarnings("java:S2925") // sleep
+    private void waitForS3() throws InterruptedException {
+        if (this.applicationConfig.isS3Enabled()) {
+            Thread.sleep(1000); // Storing in S3 is asynch, so it can take some millis
+        }
     }
 
     @Test
