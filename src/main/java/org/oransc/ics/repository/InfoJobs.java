@@ -52,7 +52,6 @@ public class InfoJobs {
     private final Gson gson;
     private final InfoTypes infoTypes;
 
-    private final ApplicationConfig config;
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final ProducerCallbacks producerCallbacks;
@@ -60,7 +59,6 @@ public class InfoJobs {
     private final DataStore dataStore;
 
     public InfoJobs(ApplicationConfig config, InfoTypes infoTypes, ProducerCallbacks producerCallbacks) {
-        this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
         ServiceLoader.load(TypeAdapterFactory.class).forEach(gsonBuilder::registerTypeAdapterFactory);
         this.gson = gsonBuilder.create();
@@ -165,7 +163,7 @@ public class InfoJobs {
         this.jobsByType.clear();
         jobsByOwner.clear();
 
-        dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).block();
+        dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).blockLast();
     }
 
     private void doPut(InfoJob job) {

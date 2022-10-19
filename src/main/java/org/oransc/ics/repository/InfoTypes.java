@@ -47,12 +47,10 @@ import reactor.core.publisher.Flux;
 public class InfoTypes {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Map<String, InfoType> allInfoTypes = new HashMap<>();
-    private final ApplicationConfig config;
     private final Gson gson;
     private final DataStore dataStore;
 
     public InfoTypes(ApplicationConfig config) {
-        this.config = config;
         GsonBuilder gsonBuilder = new GsonBuilder();
         ServiceLoader.load(TypeAdapterFactory.class).forEach(gsonBuilder::registerTypeAdapterFactory);
         this.gson = gsonBuilder.create();
@@ -107,7 +105,7 @@ public class InfoTypes {
 
     public synchronized void clear() {
         this.allInfoTypes.clear();
-        dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).block();
+        dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).blockLast();
     }
 
     public synchronized InfoType getCompatibleType(String typeId) throws ServiceException {

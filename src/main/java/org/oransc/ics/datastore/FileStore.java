@@ -125,10 +125,9 @@ class FileStore implements DataStore {
     }
 
     @Override
-    public Mono<String> deleteAllData() {
+    public Flux<String> deleteAllData() {
         return listObjects("") //
             .flatMap(this::deleteObject) //
-            .collectList() //
             .map(o -> "OK");
     }
 
