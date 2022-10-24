@@ -28,6 +28,8 @@ One information type can be supported by zero to many data producers and can be 
 .. image:: ./Architecture.png
    :width: 500pt
 
+Information Jobs and types are stored persistently by ICS in a local database. This can be either using Amazon S3 - Cloud Object Storage or file system.
+
 *********************
 Summary of principles
 *********************
@@ -37,7 +39,6 @@ Summary of principles
 * Data filtering is done at the producer.
 * A Data Consumer can create a data subscription (Information Job) regardless of the status of the data producers. The producers can come and go without any need for the Data Consumer to take any action.
   A subscription indicates the need for a type of data and the system should do its best to fulfill this.
-* Information Jobs and types are stored persistently by ICS in a local database.
 
 
 *******
