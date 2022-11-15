@@ -67,6 +67,8 @@ app:
   vardata-directory: /var/information-coordinator-service
   # If the file name is empty, no authorization token is used
   auth-token-file:
+  # A URL to a REST based service that provides authorization. This can for instance be Open Policy Agent, OPA
+  info-job-authorization-agent:
   # S3 object store usage is enabled by defining the bucket to use. This will override the vardata-directory parameter.
   s3:
     endpointOverride: http://localhost:9000

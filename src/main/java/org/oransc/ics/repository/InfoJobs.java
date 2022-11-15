@@ -39,7 +39,9 @@ import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Dynamic representation of all existing Information Jobs.
@@ -109,6 +111,14 @@ public class InfoJobs {
 
     public synchronized Collection<InfoJob> getJobs() {
         return new Vector<>(allEiJobs.values());
+    }
+
+    public synchronized Mono<InfoJob> getJobMono(String id) {
+        InfoJob job = allEiJobs.get(id);
+        if (job == null) {
+            return Mono.error(new ServiceException("Could not find Information job: " + id, HttpStatus.NOT_FOUND));
+        }
+        return Mono.just(job);
     }
 
     public synchronized InfoJob getJob(String id) throws ServiceException {

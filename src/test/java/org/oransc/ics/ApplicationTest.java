@@ -52,11 +52,14 @@ import org.oransc.ics.configuration.WebClientConfig;
 import org.oransc.ics.configuration.WebClientConfig.HttpProxyConfig;
 import org.oransc.ics.controller.A1eCallbacksSimulatorController;
 import org.oransc.ics.controller.ConsumerSimulatorController;
+import org.oransc.ics.controller.OpenPolicyAgentSimulatorController;
 import org.oransc.ics.controller.ProducerSimulatorController;
 import org.oransc.ics.controllers.a1e.A1eConsts;
 import org.oransc.ics.controllers.a1e.A1eEiJobInfo;
 import org.oransc.ics.controllers.a1e.A1eEiJobStatus;
 import org.oransc.ics.controllers.a1e.A1eEiTypeInfo;
+import org.oransc.ics.controllers.authorization.SubscriptionAuthRequest;
+import org.oransc.ics.controllers.authorization.SubscriptionAuthRequest.Input.AccessType;
 import org.oransc.ics.controllers.r1consumer.ConsumerConsts;
 import org.oransc.ics.controllers.r1consumer.ConsumerInfoTypeInfo;
 import org.oransc.ics.controllers.r1consumer.ConsumerJobInfo;
@@ -152,7 +155,10 @@ class ApplicationTest {
     @Autowired
     SecurityContext securityContext;
 
-    private static Gson gson = new GsonBuilder().create();
+    @Autowired
+    OpenPolicyAgentSimulatorController openPolicyAgentSimulatorController;
+
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     /**
      * Overrides the BeanFactory.
@@ -178,6 +184,8 @@ class ApplicationTest {
         this.consumerSimulator.getTestResults().reset();
         this.a1eCallbacksSimulator.getTestResults().reset();
         this.securityContext.setAuthTokenFilePath(null);
+        this.applicationConfig.setAuthAgentUrl("");
+        this.openPolicyAgentSimulatorController.getTestResults().reset();
     }
 
     @AfterEach
@@ -229,7 +237,7 @@ class ApplicationTest {
         putInfoProducerWithOneType("producer1", TYPE_ID);
         putInfoJob(TYPE_ID, "jobId1");
         putInfoJob(TYPE_ID, "jobId2");
-        putInfoJob(TYPE_ID, "jobId3", "otherOwner");
+        putEiJob(TYPE_ID, "jobId3", "otherOwner");
         assertThat(this.infoJobs.size()).isEqualTo(3);
         String url = ConsumerConsts.API_ROOT + "/info-jobs?owner=owner";
         restClient().delete(url).block();
@@ -422,7 +430,7 @@ class ApplicationTest {
     }
 
     @Test
-    void consumerDeleteEiJob() throws Exception {
+    void consumerDeleteInfoJob() throws Exception {
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
         putInfoJob(TYPE_ID, "jobId");
         assertThat(this.infoJobs.size()).isEqualTo(1);
@@ -549,7 +557,7 @@ class ApplicationTest {
         putInfoProducerWithOneType(REG_TYPE_ID5, REG_TYPE_ID5);
 
         String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
-        String body = gson.toJson(consumerJobInfo(PUT_TYPE_ID, "jobId"));
+        String body = gson.toJson(consumerJobInfo(PUT_TYPE_ID, "jobId", "owner"));
         ResponseEntity<String> resp = restClient().putForEntity(url, body).block();
         assertThat(this.infoJobs.size()).isEqualTo(1);
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -637,7 +645,7 @@ class ApplicationTest {
         putInfoJob("typeId1", "jobId");
 
         String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
-        String body = gson.toJson(consumerJobInfo("typeId2", "jobId"));
+        String body = gson.toJson(consumerJobInfo("typeId2", "jobId", "owner"));
         testErrorCode(restClient().put(url, body), HttpStatus.CONFLICT, "Not allowed to change type for existing job");
     }
 
@@ -1193,6 +1201,37 @@ class ApplicationTest {
     }
 
     @Test
+    void testAuthorization() throws Exception {
+        this.applicationConfig.setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_AUTH_URL);
+        final String AUTH_TOKEN = "testToken";
+        Path authFile = Files.createTempFile("icsTestAuthToken", ".txt");
+        Files.write(authFile, AUTH_TOKEN.getBytes());
+        this.securityContext.setAuthTokenFilePath(authFile);
+        putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
+        putInfoJob(TYPE_ID, "jobId");
+
+        var testResults = openPolicyAgentSimulatorController.getTestResults();
+
+        await().untilAsserted(() -> assertThat(testResults.receivedRequests).hasSize(1));
+
+        // Test OPA check
+        SubscriptionAuthRequest authRequest = testResults.receivedRequests.get(0);
+        assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
+        assertThat(authRequest.getInput().getInfoTypeId()).isEqualTo(TYPE_ID);
+        assertThat(authRequest.getInput().getAuthToken()).isEqualTo(AUTH_TOKEN);
+
+        // Test rejection from OPA
+        this.applicationConfig
+            .setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_REJECT_AUTH_URL);
+
+        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
+        testErrorCode(restClient().delete(url), HttpStatus.UNAUTHORIZED, "Not authorized");
+        assertThat(testResults.receivedRequests).hasSize(2);
+        authRequest = testResults.receivedRequests.get(1);
+        assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
+    }
+
+    @Test
     void testAuthHeader() throws Exception {
         final String AUTH_TOKEN = "testToken";
         Path authFile = Files.createTempFile("icsTestAuthToken", ".txt");
@@ -1208,7 +1247,7 @@ class ApplicationTest {
 
         Files.delete(authFile);
 
-        // Test that it works. The cached header is used
+        // Test that it works when the file is deleted. The cached header is used
         putInfoJob(TYPE_ID, "jobId2");
         await().untilAsserted(() -> assertThat(this.infoJobs.size()).isEqualByComparingTo(2));
         headers = this.producerSimulator.getTestResults().receivedHeaders.get(1);
@@ -1258,12 +1297,12 @@ class ApplicationTest {
     }
 
     private ConsumerJobInfo consumerJobInfo() throws JsonMappingException, JsonProcessingException {
-        return consumerJobInfo(TYPE_ID, EI_JOB_ID);
+        return consumerJobInfo(TYPE_ID, EI_JOB_ID, "owner");
     }
 
-    ConsumerJobInfo consumerJobInfo(String typeId, String infoJobId)
+    ConsumerJobInfo consumerJobInfo(String typeId, String infoJobId, String owner)
         throws JsonMappingException, JsonProcessingException {
-        return new ConsumerJobInfo(typeId, jsonObject(), "owner", "https://junk.com",
+        return new ConsumerJobInfo(typeId, jsonObject(), owner, "https://junk.com",
             baseUrl() + A1eCallbacksSimulatorController.getJobStatusUrl(infoJobId));
     }
 
@@ -1314,19 +1353,21 @@ class ApplicationTest {
         return jsonObject("{ " + EI_JOB_PROPERTY + " : \"value\" }");
     }
 
-    private InfoJob putInfoJob(String infoTypeId, String jobId, String owner) throws Exception {
+    private InfoJob putEiJob(String infoTypeId, String jobId, String owner) throws Exception {
         String url = A1eConsts.API_ROOT + "/eijobs/" + jobId;
         String body = gson.toJson(eiJobInfo(infoTypeId, jobId, owner));
         restClient().putForEntity(url, body).block();
-
         return this.infoJobs.getJob(jobId);
 
     }
 
     private InfoJob putInfoJob(String infoTypeId, String jobId) throws Exception {
+        return putInfoJob(infoTypeId, jobId, "owner");
+    }
 
-        String url = A1eConsts.API_ROOT + "/eijobs/" + jobId;
-        String body = gson.toJson(eiJobInfo(infoTypeId, jobId));
+    private InfoJob putInfoJob(String infoTypeId, String jobId, String owner) throws Exception {
+        String url = ConsumerConsts.API_ROOT + "/info-jobs/" + jobId;
+        String body = gson.toJson(consumerJobInfo(infoTypeId, jobId, owner));
         restClient().putForEntity(url, body).block();
 
         return this.infoJobs.getJob(jobId);

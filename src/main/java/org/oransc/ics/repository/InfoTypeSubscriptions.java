@@ -57,7 +57,7 @@ public class InfoTypeSubscriptions {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Map<String, SubscriptionInfo> allSubscriptions = new HashMap<>();
     private final MultiMap<String, SubscriptionInfo> subscriptionsByOwner = new MultiMap<>();
-    private final Gson gson = new GsonBuilder().create();
+    private final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private final Map<String, ConsumerCallbackHandler> callbackHandlers = new HashMap<>();
     private final DataStore dataStore;
 

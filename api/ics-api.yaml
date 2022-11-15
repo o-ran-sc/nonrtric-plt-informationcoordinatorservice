@@ -49,6 +49,9 @@ tags:
   externalDocs:
     description: Spring Boot Actuator Web API Documentation
     url: https://docs.spring.io/spring-boot/docs/current/actuator-api/html/
+- name: Authorization API
+  description: API used for authorization of information job access (this is provided
+    by an authorization producer such as OPA)
 paths:
   /data-producer/v1/info-types:
     get:
@@ -478,7 +481,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/MonoResponseEntityObject'
   /actuator/loggers/{name}:
     get:
       tags:
@@ -1226,6 +1229,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
+  /example-subscription-auth:
+    post:
+      tags:
+      - Authorization API
+      summary: Request for access authorization.
+      description: The authorization function decides if access is granted.
+      operationId: subscriptionAuth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscription_authorization'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authorization_result'
   /actuator/heapdump:
     get:
       tags:
@@ -1267,6 +1290,17 @@ components:
     EiTypeObject:
       type: object
       description: Information for an EI type
+    MonoResponseEntityObject:
+      type: object
+    authorization_result:
+      required:
+      - result
+      type: object
+      properties:
+        result:
+          type: boolean
+          description: If true, the access is granted
+      description: Result of authorization
     service_status_info:
       required:
       - no_of_jobs
@@ -1406,6 +1440,14 @@ components:
           type: object
           description: EI type specific job data
       description: Information for an Enrichment Information Job
+    subscription_authorization:
+      required:
+      - input
+      type: object
+      properties:
+        input:
+          $ref: '#/components/schemas/input'
+      description: Authorization request for subscription requests
     producer_info_type_info:
       required:
       - info_job_data_schema
@@ -1443,6 +1485,30 @@ components:
           description: Type identity for the job
       description: The body of the Information Producer callbacks for Information
         Job creation and deletion
+    input:
+      required:
+      - access_type
+      - auth_token
+      - info_type_id
+      - job_definition
+      type: object
+      properties:
+        access_type:
+          type: string
+          description: Access type
+          enum:
+          - READ
+          - WRITE
+        info_type_id:
+          type: string
+          description: Information type identifier
+        job_definition:
+          type: object
+          description: Information type specific job data
+        auth_token:
+          type: string
+          description: Authorization token
+      description: input
     consumer_job:
       required:
       - info_type_id

@@ -40,7 +40,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class ConsumerCallbacks implements InfoTypeSubscriptions.ConsumerCallbackHandler {
 
-    private static Gson gson = new GsonBuilder().create();
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private final AsyncRestClient restClient;
 

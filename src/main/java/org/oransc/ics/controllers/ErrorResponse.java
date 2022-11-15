@@ -38,7 +38,7 @@ import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 
 public class ErrorResponse {
-    private static Gson gson = new GsonBuilder().create();
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     // Returned as body for all failed REST calls
@@ -86,6 +86,10 @@ public class ErrorResponse {
 
     ErrorResponse(String message) {
         this.message = message;
+    }
+
+    public static Mono<ResponseEntity<Object>> createMono(Throwable e) {
+        return Mono.just(create(e, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     public static Mono<ResponseEntity<Object>> createMono(Throwable e, HttpStatus code) {

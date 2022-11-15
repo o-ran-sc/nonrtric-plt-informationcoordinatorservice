@@ -32,6 +32,16 @@
             "description": "Information for an EI type",
             "type": "object"
         },
+        "MonoResponseEntityObject": {"type": "object"},
+        "authorization_result": {
+            "description": "Result of authorization",
+            "type": "object",
+            "required": ["result"],
+            "properties": {"result": {
+                "description": "If true, the access is granted",
+                "type": "boolean"
+            }}
+        },
         "service_status_info": {
             "type": "object",
             "required": [
@@ -204,6 +214,12 @@
                 }
             }
         },
+        "subscription_authorization": {
+            "description": "Authorization request for subscription requests",
+            "type": "object",
+            "required": ["input"],
+            "properties": {"input": {"$ref": "#/components/schemas/input"}}
+        },
         "producer_info_type_info": {
             "description": "Information for an Information Type",
             "type": "object",
@@ -246,6 +262,38 @@
                 },
                 "info_type_identity": {
                     "description": "Type identity for the job",
+                    "type": "string"
+                }
+            }
+        },
+        "input": {
+            "description": "input",
+            "type": "object",
+            "required": [
+                "access_type",
+                "auth_token",
+                "info_type_id",
+                "job_definition"
+            ],
+            "properties": {
+                "access_type": {
+                    "description": "Access type",
+                    "type": "string",
+                    "enum": [
+                        "READ",
+                        "WRITE"
+                    ]
+                },
+                "info_type_id": {
+                    "description": "Information type identifier",
+                    "type": "string"
+                },
+                "job_definition": {
+                    "description": "Information type specific job data",
+                    "type": "object"
+                },
+                "auth_token": {
+                    "description": "Authorization token",
                     "type": "string"
                 }
             }
@@ -651,7 +699,7 @@
                 "operationId": "deleteJobsForOwner",
                 "responses": {"204": {
                     "description": "No Content",
-                    "content": {"application/json": {"schema": {"type": "object"}}}
+                    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/MonoResponseEntityObject"}}}
                 }},
                 "parameters": [{
                     "schema": {"type": "string"},
@@ -1238,6 +1286,20 @@
             }],
             "tags": ["Data producer (registration)"]
         }},
+        "/example-subscription-auth": {"post": {
+            "summary": "Request for access authorization.",
+            "requestBody": {
+                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/subscription_authorization"}}},
+                "required": true
+            },
+            "description": "The authorization function decides if access is granted.",
+            "operationId": "subscriptionAuth",
+            "responses": {"200": {
+                "description": "OK",
+                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/authorization_result"}}}
+            }},
+            "tags": ["Authorization API"]
+        }},
         "/actuator/heapdump": {"get": {
             "summary": "Actuator web endpoint 'heapdump'",
             "operationId": "heapdump",
@@ -1293,6 +1355,10 @@
                 "description": "Spring Boot Actuator Web API Documentation",
                 "url": "https://docs.spring.io/spring-boot/docs/current/actuator-api/html/"
             }
+        },
+        {
+            "name": "Authorization API",
+            "description": "API used for authorization of information job access (this is provided by an authorization producer such as OPA)"
         }
     ]
 }

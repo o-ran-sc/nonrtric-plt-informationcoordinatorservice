@@ -38,11 +38,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
+import org.oransc.ics.controllers.authorization.AuthorizationCheck;
+import org.oransc.ics.controllers.authorization.SubscriptionAuthRequest.Input.AccessType;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.exceptions.ServiceException;
 import org.oransc.ics.repository.InfoJob;
@@ -61,6 +64,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -89,7 +93,10 @@ public class A1eController {
     @Autowired
     ProducerCallbacks producerCallbacks;
 
-    private static Gson gson = new GsonBuilder().create();
+    @Autowired
+    private AuthorizationCheck authorization;
+
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     @GetMapping(path = "/eitypes", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "EI type identifiers", description = "")
@@ -172,9 +179,7 @@ public class A1eController {
                 this.infoJobs.getJobs().forEach(job -> result.add(job.getId()));
             }
             return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
-        } catch (
-
-        Exception e) {
+        } catch (Exception e) {
             return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
         }
     }
@@ -192,14 +197,14 @@ public class A1eController {
                 description = "Enrichment Information job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> getIndividualEiJob( //
-        @PathVariable("eiJobId") String eiJobId) {
-        try {
-            InfoJob job = this.infoJobs.getJob(eiJobId);
-            return new ResponseEntity<>(gson.toJson(toEiJobInfo(job)), HttpStatus.OK);
-        } catch (Exception e) {
-            return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
-        }
+    public Mono<ResponseEntity<Object>> getIndividualEiJob( //
+        @PathVariable("eiJobId") String eiJobId, //
+        @RequestHeader Map<String, String> headers) {
+
+        return this.infoJobs.getJobMono(eiJobId)
+            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.READ)) //
+            .map(job -> new ResponseEntity<Object>(gson.toJson(toEiJobInfo(job)), HttpStatus.OK))
+            .onErrorResume(ErrorResponse::createMono);
     }
 
     @GetMapping(path = "/eijobs/{eiJobId}/status", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,15 +253,14 @@ public class A1eController {
                 description = "Enrichment Information job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> deleteIndividualEiJob( //
-        @PathVariable("eiJobId") String eiJobId) {
-        try {
-            InfoJob job = this.infoJobs.getJob(eiJobId);
-            this.infoJobs.remove(job, this.infoProducers);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
-        }
+    public Mono<ResponseEntity<Object>> deleteIndividualEiJob( //
+        @PathVariable("eiJobId") String eiJobId, //
+        @RequestHeader Map<String, String> headers) {
+
+        return this.infoJobs.getJobMono(eiJobId)
+            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers))
+            .map(x -> new ResponseEntity<>(HttpStatus.NO_CONTENT)).onErrorResume(ErrorResponse::createMono);
     }
 
     @PutMapping(
@@ -285,18 +289,17 @@ public class A1eController {
             @ApiResponse(
                 responseCode = "409",
                 description = "Cannot modify job type", //
-                content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class)))
-
-        })
-
+                content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class)))})
     public Mono<ResponseEntity<Object>> putIndividualEiJob( //
         @PathVariable("eiJobId") String eiJobId, //
-        @RequestBody A1eEiJobInfo eiJobObject) throws ServiceException {
+        @RequestBody A1eEiJobInfo eiJobObject, //
+        @RequestHeader Map<String, String> headers) throws ServiceException {
 
         final boolean isNewJob = this.infoJobs.get(eiJobId) == null;
         InfoType eiType = this.infoTypes.getCompatibleType(eiJobObject.eiTypeId);
 
-        return validatePutEiJob(eiJobId, eiType, eiJobObject) //
+        return authorization.authorizeDataJob(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
+            .flatMap(x -> validatePutEiJob(eiJobId, eiType, eiJobObject)) //
             .flatMap(job -> startEiJob(job, eiType)) //
             .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //
             .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
