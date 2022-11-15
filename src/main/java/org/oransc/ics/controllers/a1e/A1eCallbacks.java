@@ -50,7 +50,7 @@ import reactor.core.publisher.Mono;
 public class A1eCallbacks {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Gson gson = new GsonBuilder().create();
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private final AsyncRestClient restClient;
     private final InfoJobs eiJobs;

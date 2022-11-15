@@ -132,7 +132,8 @@ public class ProducerSimulatorController {
                 content = @Content(schema = @Schema(implementation = VoidResponse.class))) //
         })
     public ResponseEntity<Object> jobDeletedCallback( //
-        @RequestHeader Map<String, String> headers, @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId) {
+        @RequestHeader Map<String, String> headers, //
+        @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId) {
         try {
             logHeaders(headers);
             logger.info("Job deleted callback {}", infoJobId);

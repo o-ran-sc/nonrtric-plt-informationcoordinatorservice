@@ -21,6 +21,7 @@
 package org.oransc.ics.configuration;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import org.oransc.ics.configuration.WebClientConfig.HttpProxyConfig;
 import org.slf4j.Logger;
@@ -81,6 +82,11 @@ public class ApplicationConfig {
     @Getter
     @Value("${app.s3.bucket:}")
     private String s3Bucket;
+
+    @Getter
+    @Setter
+    @Value("${app.info-job-authorization-agent:}")
+    private String authAgentUrl;
 
     private WebClientConfig webClientConfig = null;
 

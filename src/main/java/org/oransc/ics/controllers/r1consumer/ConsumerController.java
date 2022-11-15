@@ -39,10 +39,13 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
+import org.oransc.ics.controllers.authorization.AuthorizationCheck;
+import org.oransc.ics.controllers.authorization.SubscriptionAuthRequest.Input.AccessType;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.exceptions.ServiceException;
 import org.oransc.ics.repository.InfoJob;
@@ -63,9 +66,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @SuppressWarnings("java:S3457") // No need to call "toString()" method as formatting and string ..
@@ -80,16 +86,19 @@ public class ConsumerController {
     private final InfoProducers infoProducers;
     private final ProducerCallbacks producerCallbacks;
     private final InfoTypeSubscriptions infoTypeSubscriptions;
-    private static Gson gson = new GsonBuilder().create();
+    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private final AuthorizationCheck authorization;
 
-    public ConsumerController(@Autowired InfoJobs jobs, @Autowired InfoTypes infoTypes,
-        @Autowired InfoProducers infoProducers, @Autowired ProducerCallbacks producerCallbacks,
-        @Autowired InfoTypeSubscriptions infoTypeSubscriptions) {
+    @Autowired
+    public ConsumerController(InfoJobs jobs, InfoTypes infoTypes, InfoProducers infoProducers,
+        ProducerCallbacks producerCallbacks, InfoTypeSubscriptions infoTypeSubscriptions,
+        AuthorizationCheck authorization) {
         this.infoProducers = infoProducers;
         this.infoJobs = jobs;
         this.infoTypeSubscriptions = infoTypeSubscriptions;
         this.infoTypes = infoTypes;
         this.producerCallbacks = producerCallbacks;
+        this.authorization = authorization;
     }
 
     @GetMapping(path = "/info-types", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -187,19 +196,22 @@ public class ConsumerController {
         value = { //
             @ApiResponse(responseCode = "204") //
         })
-    public ResponseEntity<Object> deleteJobsForOwner( //
-
+    public Mono<ResponseEntity<Object>> deleteJobsForOwner( //
         @Parameter(
             name = ConsumerConsts.OWNER_PARAM,
             required = true, //
             description = ConsumerConsts.OWNER_PARAM_DESCRIPTION) //
-        @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = true) String owner) {
+        @RequestParam(name = ConsumerConsts.OWNER_PARAM, required = true) String owner, //
+        @RequestHeader Map<String, String> headers) {
 
-        for (InfoJob job : this.infoJobs.getJobsForOwner(owner)) {
-            logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(), job.getType().getId(), owner);
-            this.infoJobs.remove(job, this.infoProducers);
-        }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return Flux.fromIterable(this.infoJobs.getJobsForOwner(owner))
+            .doOnNext(job -> logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(),
+                job.getType().getId(), owner))
+            .flatMap(job -> this.authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers)) //
+            .collectList() //
+            .map(l -> new ResponseEntity<>(HttpStatus.NO_CONTENT)) //
+            .onErrorResume(ErrorResponse::createMono);
     }
 
     @GetMapping(path = "/info-jobs/{infoJobId}", produces = MediaType.APPLICATION_JSON_VALUE) //
@@ -215,15 +227,15 @@ public class ConsumerController {
                 description = "Information subscription job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> getIndividualInfoJob( //
-        @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId) {
-        try {
-            logger.debug("GET info job, id: {}", infoJobId);
-            InfoJob job = this.infoJobs.getJob(infoJobId);
-            return new ResponseEntity<>(gson.toJson(toInfoJobInfo(job)), HttpStatus.OK);
-        } catch (Exception e) {
-            return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
-        }
+    public Mono<ResponseEntity<Object>> getIndividualInfoJob( //
+        @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String infoJobId, //
+        @RequestHeader Map<String, String> headers) {
+
+        logger.debug("GET info job, id: {}", infoJobId);
+        return this.infoJobs.getJobMono(infoJobId) //
+            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.READ)) //
+            .map(job -> new ResponseEntity<Object>(gson.toJson(toInfoJobInfo(job)), HttpStatus.OK)) //
+            .onErrorResume(ErrorResponse::createMono);
     }
 
     @GetMapping(path = "/info-jobs/{infoJobId}/status", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -278,16 +290,16 @@ public class ConsumerController {
                 description = "Information subscription job is not found", //
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
-    public ResponseEntity<Object> deleteIndividualInfoJob( //
-        @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId) {
-        try {
-            logger.debug("DELETE info job, id: {}", jobId);
-            InfoJob job = this.infoJobs.getJob(jobId);
-            this.infoJobs.remove(job, this.infoProducers);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return ErrorResponse.create(e, HttpStatus.NOT_FOUND);
-        }
+    public Mono<ResponseEntity<Object>> deleteIndividualInfoJob( //
+        @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId, //
+        @RequestHeader Map<String, String> headers) {
+
+        logger.debug("DELETE info job, id: {}", jobId);
+        return this.infoJobs.getJobMono(jobId) //
+            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers)) //
+            .map(job -> new ResponseEntity<>(HttpStatus.NO_CONTENT)) //
+            .onErrorResume(ErrorResponse::createMono);
     }
 
     @PutMapping(
@@ -319,18 +331,20 @@ public class ConsumerController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class)))})
     public Mono<ResponseEntity<Object>> putIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId, //
-        @RequestBody ConsumerJobInfo informationJobObject) throws ServiceException {
+        @RequestBody ConsumerJobInfo informationJobObject, //
+        @RequestHeader Map<String, String> headers) throws ServiceException {
 
         final boolean isNewJob = this.infoJobs.get(jobId) == null;
 
         logger.debug("PUT info job, id: {}, obj: {}", jobId, informationJobObject);
         InfoType infoType = this.infoTypes.getCompatibleType(informationJobObject.infoTypeId);
 
-        return validatePutInfoJob(jobId, infoType, informationJobObject) //
+        return authorization.authorizeDataJob(headers, infoType, informationJobObject.jobDefinition, AccessType.WRITE) //
+            .flatMap(x -> validatePutInfoJob(jobId, infoType, informationJobObject)) //
             .flatMap(job -> startInfoSubscriptionJob(job, infoType)) //
             .doOnNext(this.infoJobs::put) //
             .map(newJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
-            .onErrorResume(throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.NOT_FOUND)));
+            .onErrorResume(ErrorResponse::createMono);
     }
 
     @GetMapping(path = "/info-type-subscription", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -380,7 +394,8 @@ public class ConsumerController {
                 content = @Content(schema = @Schema(implementation = ErrorResponse.ErrorInfo.class))) //
         })
     public ResponseEntity<Object> getIndividualTypeSubscription( //
-        @PathVariable(ConsumerConsts.SUBSCRIPTION_ID_PATH) String subscriptionId) {
+        @PathVariable(ConsumerConsts.SUBSCRIPTION_ID_PATH) String subscriptionId, //
+        @RequestHeader Map<String, String> headers) {
         try {
             logger.debug("GET info type subscription, subscriptionId: {}", subscriptionId);
             InfoTypeSubscriptions.SubscriptionInfo subscription =
