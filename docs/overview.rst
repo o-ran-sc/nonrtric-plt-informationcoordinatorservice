@@ -30,6 +30,13 @@ One information type can be supported by zero to many data producers and can be 
 
 Information Jobs and types are stored persistently by ICS in a local database. This can be either using Amazon S3 - Cloud Object Storage or file system.
 
+To restrict which data that can be consumed by by whom there is support for finegrained access control. When data subscriptions/jobs are modified or read, an access check can be performed.
+ICS can be configured to call an external authorizer. 
+This can be for instance Open Policy Agent (OPA) which can grant or deny accesses based on an access token (JWT) used by the calling data consumer.
+In addition to this the information type, accesstype (read/write) and all type specific parameters can be used by access rules.
+
+The URL to the authorization component is defined in the application.yaml file and the call invoked to by ICS is described in API documentation.
+
 *********************
 Summary of principles
 *********************
