@@ -30,6 +30,10 @@ One information type can be supported by zero to many data producers and can be 
 
 Information Jobs and types are stored persistently by ICS in a local database. This can be either using Amazon S3 - Cloud Object Storage or file system.
 
+To restrict which data that can be consumed by by whom there is support for faine grained access control. When data subscriptions/jobs are an access check can be invoked.
+This can be be done by using for instance Open Policy Agent which can grant or deny accesses based on an access token (JWT) used by the calling data consumer.
+In addition to this the information type, accesstype (read/write) and all type specific parameters can be used by access rules.
+
 *********************
 Summary of principles
 *********************
