@@ -36,7 +36,6 @@ import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import reactor.core.publisher.Flux;
@@ -55,7 +54,6 @@ public class A1eCallbacks {
     private final AsyncRestClient restClient;
     private final InfoJobs eiJobs;
 
-    @Autowired
     public A1eCallbacks(ApplicationConfig config, InfoJobs eiJobs, SecurityContext securityContext) {
         AsyncRestClientFactory restClientFactory =
             new AsyncRestClientFactory(config.getWebClientConfig(), securityContext);

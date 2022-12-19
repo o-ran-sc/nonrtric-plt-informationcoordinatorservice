@@ -296,14 +296,19 @@ public class A1eController {
         @RequestHeader Map<String, String> headers) throws ServiceException {
 
         final boolean isNewJob = this.infoJobs.get(eiJobId) == null;
-        InfoType eiType = this.infoTypes.getCompatibleType(eiJobObject.eiTypeId);
+        try {
+            InfoType eiType = this.infoTypes.getCompatibleType(eiJobObject.eiTypeId);
 
-        return authorization.authorizeDataJob(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
-            .flatMap(x -> validatePutEiJob(eiJobId, eiType, eiJobObject)) //
-            .flatMap(job -> startEiJob(job, eiType)) //
-            .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //
-            .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
-            .onErrorResume(throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.INTERNAL_SERVER_ERROR)));
+            return authorization.authorizeDataJob(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
+                .flatMap(x -> validatePutEiJob(eiJobId, eiType, eiJobObject)) //
+                .flatMap(job -> startEiJob(job, eiType)) //
+                .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //
+                .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
+                .onErrorResume(
+                    throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.INTERNAL_SERVER_ERROR)));
+        } catch (Exception e) {
+            return Mono.just(ErrorResponse.create(e, HttpStatus.INTERNAL_SERVER_ERROR));
+        }
     }
 
     private Mono<InfoJob> startEiJob(InfoJob newEiJob, InfoType type) {

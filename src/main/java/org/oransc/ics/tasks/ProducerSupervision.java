@@ -20,7 +20,6 @@
 
 package org.oransc.ics.tasks;
 
-import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.controllers.a1e.A1eCallbacks;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.repository.InfoJob;
@@ -29,7 +28,6 @@ import org.oransc.ics.repository.InfoProducer;
 import org.oransc.ics.repository.InfoProducers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -52,9 +50,8 @@ public class ProducerSupervision {
     private final ProducerCallbacks producerCallbacks;
     private final A1eCallbacks consumerCallbacks;
 
-    @Autowired
-    public ProducerSupervision(ApplicationConfig applicationConfig, InfoProducers infoProducers, InfoJobs infoJobs,
-        ProducerCallbacks producerCallbacks, A1eCallbacks consumerCallbacks) {
+    public ProducerSupervision(InfoProducers infoProducers, InfoJobs infoJobs, ProducerCallbacks producerCallbacks,
+        A1eCallbacks consumerCallbacks) {
         this.infoProducers = infoProducers;
         this.infoJobs = infoJobs;
         this.producerCallbacks = producerCallbacks;
