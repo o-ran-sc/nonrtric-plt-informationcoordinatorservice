@@ -177,9 +177,14 @@ public class InfoJobs {
     }
 
     private void doPut(InfoJob job) {
-        allEiJobs.put(job.getId(), job);
-        jobsByType.put(job.getType().getId(), job);
-        jobsByOwner.put(job.getOwner(), job);
+        InfoJob prevDefinition = this.get(job.getId());
+        if (prevDefinition == null) {
+            allEiJobs.put(job.getId(), job);
+            jobsByType.put(job.getType().getId(), job);
+            jobsByOwner.put(job.getOwner(), job);
+        } else {
+            prevDefinition.update(job);
+        }
     }
 
     private void storeJob(InfoJob job) {

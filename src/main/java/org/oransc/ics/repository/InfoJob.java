@@ -44,16 +44,16 @@ public class InfoJob {
     private final InfoType type;
 
     @Getter
-    private final String owner;
+    private String owner;
 
     @Getter
-    private final Object jobData;
+    private Object jobData;
 
     @Getter
-    private final String targetUrl;
+    private String targetUrl;
 
     @Getter
-    private final String jobStatusUrl;
+    private String jobStatusUrl;
 
     @Getter
     @Builder.Default
@@ -104,6 +104,13 @@ public class InfoJob {
             return this.id.equals(((InfoJob) o).id);
         }
         return this.id.equals(o);
+    }
+
+    public synchronized void update(InfoJob job) {
+        this.jobData = job.jobData;
+        this.owner = job.owner;
+        this.jobStatusUrl = job.jobStatusUrl;
+        this.targetUrl = job.targetUrl;
     }
 
 }

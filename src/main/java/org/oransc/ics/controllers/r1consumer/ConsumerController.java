@@ -57,7 +57,6 @@ import org.oransc.ics.repository.InfoTypeSubscriptions;
 import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +88,6 @@ public class ConsumerController {
     private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private final AuthorizationCheck authorization;
 
-    @Autowired
     public ConsumerController(InfoJobs jobs, InfoTypes infoTypes, InfoProducers infoProducers,
         ProducerCallbacks producerCallbacks, InfoTypeSubscriptions infoTypeSubscriptions,
         AuthorizationCheck authorization) {
@@ -332,19 +330,24 @@ public class ConsumerController {
     public Mono<ResponseEntity<Object>> putIndividualInfoJob( //
         @PathVariable(ConsumerConsts.INFO_JOB_ID_PATH) String jobId, //
         @RequestBody ConsumerJobInfo informationJobObject, //
-        @RequestHeader Map<String, String> headers) throws ServiceException {
+        @RequestHeader Map<String, String> headers) {
 
         final boolean isNewJob = this.infoJobs.get(jobId) == null;
 
         logger.debug("PUT info job, id: {}, obj: {}", jobId, informationJobObject);
-        InfoType infoType = this.infoTypes.getCompatibleType(informationJobObject.infoTypeId);
+        try {
+            InfoType infoType = this.infoTypes.getCompatibleType(informationJobObject.infoTypeId);
 
-        return authorization.authorizeDataJob(headers, infoType, informationJobObject.jobDefinition, AccessType.WRITE) //
-            .flatMap(x -> validatePutInfoJob(jobId, infoType, informationJobObject)) //
-            .flatMap(job -> startInfoSubscriptionJob(job, infoType)) //
-            .doOnNext(this.infoJobs::put) //
-            .map(newJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
-            .onErrorResume(ErrorResponse::createMono);
+            return authorization
+                .authorizeDataJob(headers, infoType, informationJobObject.jobDefinition, AccessType.WRITE) //
+                .flatMap(x -> validatePutInfoJob(jobId, infoType, informationJobObject)) //
+                .flatMap(job -> startInfoSubscriptionJob(job, infoType)) //
+                .doOnNext(this.infoJobs::put) //
+                .map(newJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
+                .onErrorResume(ErrorResponse::createMono);
+        } catch (Exception e) {
+            return ErrorResponse.createMono(e, HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping(path = "/info-type-subscription", produces = MediaType.APPLICATION_JSON_VALUE)

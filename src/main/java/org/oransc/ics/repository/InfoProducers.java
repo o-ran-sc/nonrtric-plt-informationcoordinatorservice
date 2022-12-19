@@ -32,7 +32,6 @@ import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -44,18 +43,18 @@ import org.springframework.stereotype.Component;
 public class InfoProducers {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Map<String, InfoProducer> allInfoProducers = new HashMap<>();
+    private final ProducerCallbacks producerCallbacks;
+    private final A1eCallbacks consumerCallbacks;
+    private final InfoJobs infoJobs;
+    private final InfoTypes infoTypes;
 
-    @Autowired
-    private ProducerCallbacks producerCallbacks;
-
-    @Autowired
-    private A1eCallbacks consumerCallbacks;
-
-    @Autowired
-    private InfoJobs infoJobs;
-
-    @Autowired
-    private InfoTypes infoTypes;
+    public InfoProducers(ProducerCallbacks producerCallbacks, A1eCallbacks consumerCallbacks, InfoJobs infoJobs,
+        InfoTypes infoTypes) {
+        this.producerCallbacks = producerCallbacks;
+        this.consumerCallbacks = consumerCallbacks;
+        this.infoJobs = infoJobs;
+        this.infoTypes = infoTypes;
+    }
 
     public InfoProducer registerProducer(InfoProducerRegistrationInfo producerInfo) {
         final String producerId = producerInfo.getId();

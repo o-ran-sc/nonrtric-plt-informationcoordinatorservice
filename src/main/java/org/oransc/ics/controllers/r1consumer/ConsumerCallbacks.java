@@ -29,7 +29,6 @@ import org.oransc.ics.clients.SecurityContext;
 import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.repository.InfoType;
 import org.oransc.ics.repository.InfoTypeSubscriptions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +45,6 @@ public class ConsumerCallbacks implements InfoTypeSubscriptions.ConsumerCallback
 
     public static final String API_VERSION = "version_1";
 
-    @Autowired
     public ConsumerCallbacks(ApplicationConfig config, InfoTypeSubscriptions infoTypeSubscriptions,
         SecurityContext securityContext) {
         AsyncRestClientFactory restClientFactory =

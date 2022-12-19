@@ -88,8 +88,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -505,7 +505,7 @@ class ApplicationTest {
         putInfoProducerWithOneType(REG_TYPE_ID4, REG_TYPE_ID4);
         putInfoProducerWithOneType(REG_TYPE_ID5, REG_TYPE_ID5);
 
-        String url = A1eConsts.API_ROOT + "/eijobs/jobId";
+        String url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
         String body = gson.toJson(eiJobInfo(PUT_TYPE_ID, EI_JOB_ID));
         ResponseEntity<String> resp = restClient().putForEntity(url, body).block();
         assertThat(this.infoJobs.size()).isEqualTo(1);
@@ -514,6 +514,25 @@ class ApplicationTest {
 
         resp = restClient().putForEntity(url, body).block();
         assertThat(resp.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        restClient().delete(url).block();
+
+    }
+
+    @Test
+    void testA1EPutJob_unknownType() throws Exception {
+        final String REG_TYPE_ID1 = "type_1.5.0"; // Compatible
+        putInfoProducerWithOneType(REG_TYPE_ID1, REG_TYPE_ID1);
+
+        String body = gson.toJson(eiJobInfo("junkTypeId", EI_JOB_ID));
+
+        String url = A1eConsts.API_ROOT + "/eijobs/jobId";
+        testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
+
+        url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
+        final String PUT_TYPE_ERROR_ID = "type_1.1";
+        body = gson.toJson(eiJobInfo(PUT_TYPE_ERROR_ID, EI_JOB_ID));
+        testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
     }
 
     @Test
@@ -538,6 +557,9 @@ class ApplicationTest {
         assertThat(job.getOwner()).isEqualTo("owner");
 
         verifyJobStatus(EI_JOB_ID, "ENABLED");
+
+        body = gson.toJson(consumerJobInfo("junkTypeId", "jobId", ""));
+        testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
     }
 
     @Test
@@ -591,8 +613,8 @@ class ApplicationTest {
 
         String url = A1eConsts.API_ROOT + "/eijobs/jobId";
         // The element with name "property1" is mandatory in the schema
-        A1eEiJobInfo jobInfo =
-            new A1eEiJobInfo(TYPE_ID, jsonObject("{ \"XXstring\" : \"value\" }"), "owner", "targetUri", "jobStatusUrl");
+        A1eEiJobInfo jobInfo = new A1eEiJobInfo(TYPE_ID, toJsonObject("{ \"XXstring\" : \"value\" }"), "owner",
+            "targetUri", "jobStatusUrl");
         String body = gson.toJson(jobInfo);
 
         testErrorCode(restClient().put(url, body), HttpStatus.BAD_REQUEST, "Json validation failure");
@@ -608,7 +630,7 @@ class ApplicationTest {
         String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
         // The element with name "property1" is mandatory in the schema
         ConsumerJobInfo jobInfo =
-            new ConsumerJobInfo(TYPE_ID, jsonObject("{ \"XXstring\" : \"value\" }"), "owner", "targetUri", null);
+            new ConsumerJobInfo(TYPE_ID, toJsonObject("{ \"XXstring\" : \"value\" }"), "owner", "targetUri", null);
         String body = gson.toJson(jobInfo);
 
         testErrorCode(restClient().put(url, body), HttpStatus.BAD_REQUEST, "Json validation failure");
@@ -620,7 +642,7 @@ class ApplicationTest {
 
         String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
 
-        ConsumerJobInfo jobInfo = new ConsumerJobInfo(TYPE_ID, jsonObject(), "owner", "junk", null);
+        ConsumerJobInfo jobInfo = new ConsumerJobInfo(TYPE_ID, jsonObject(""), "owner", "junk", null);
         String body = gson.toJson(jobInfo);
 
         testErrorCode(restClient().put(url, body), HttpStatus.BAD_REQUEST, "URI: junk is not absolute");
@@ -1302,7 +1324,7 @@ class ApplicationTest {
 
     ConsumerJobInfo consumerJobInfo(String typeId, String infoJobId, String owner)
         throws JsonMappingException, JsonProcessingException {
-        return new ConsumerJobInfo(typeId, jsonObject(), owner, "https://junk.com",
+        return new ConsumerJobInfo(typeId, jsonObject(owner), owner, "https://junk.com",
             baseUrl() + A1eCallbacksSimulatorController.getJobStatusUrl(infoJobId));
     }
 
@@ -1316,11 +1338,11 @@ class ApplicationTest {
     }
 
     A1eEiJobInfo eiJobInfo(String typeId, String infoJobId, String owner) throws Exception {
-        return new A1eEiJobInfo(typeId, jsonObject(), owner, "https://junk.com",
+        return new A1eEiJobInfo(typeId, jsonObject(owner), owner, "https://junk.com",
             baseUrl() + A1eCallbacksSimulatorController.getJobStatusUrl(infoJobId));
     }
 
-    private Object jsonObject(String json) {
+    private Object toJsonObject(String json) {
         try {
             return JsonParser.parseString(json).getAsJsonObject();
         } catch (Exception e) {
@@ -1328,8 +1350,12 @@ class ApplicationTest {
         }
     }
 
+    private Object jsonObject(String aValue) {
+        return toJsonObject("{ " + EI_JOB_PROPERTY + " : \"" + aValue + "\" }");
+    }
+
     private Object typeSpecifcInfoObject() {
-        return jsonObject("{ \"propertyName\" : \"value\" }");
+        return toJsonObject("{ \"propertyName\" : \"value\" }");
     }
 
     private Object jsonSchemaObject() {
@@ -1346,11 +1372,7 @@ class ApplicationTest {
             + EI_JOB_PROPERTY //
             + "]" //
             + "}"; //
-        return jsonObject(schemaStr);
-    }
-
-    private Object jsonObject() {
-        return jsonObject("{ " + EI_JOB_PROPERTY + " : \"value\" }");
+        return toJsonObject(schemaStr);
     }
 
     private InfoJob putEiJob(String infoTypeId, String jobId, String owner) throws Exception {
@@ -1402,7 +1424,9 @@ class ApplicationTest {
 
     private InfoType putInfoProducerWithOneType(String producerId, String infoTypeId)
         throws JsonMappingException, JsonProcessingException, ServiceException {
-        this.putInfoType(infoTypeId);
+        if (this.infoTypes.get(infoTypeId) == null) {
+            this.putInfoType(infoTypeId);
+        }
 
         String url = ProducerConsts.API_ROOT + "/info-producers/" + producerId;
         String body = gson.toJson(producerInfoRegistratioInfo(infoTypeId));

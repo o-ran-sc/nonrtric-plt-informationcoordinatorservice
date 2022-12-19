@@ -223,15 +223,18 @@ public class ProducerController {
             name = ProducerConsts.INFO_TYPE_ID_PARAM,
             required = false,
             description = "If given, only the producers for the Info Type is returned.") //
-        @RequestParam(name = ProducerConsts.INFO_TYPE_ID_PARAM, required = false) String typeId //
-    ) throws ServiceException {
+        @RequestParam(name = ProducerConsts.INFO_TYPE_ID_PARAM, required = false) String typeId) {
         logger.debug("GET producer identifiers");
-        List<String> result = new ArrayList<>();
-        for (InfoProducer infoProducer : getProducers(typeId)) {
-            result.add(infoProducer.getId());
-        }
+        try {
+            List<String> result = new ArrayList<>();
+            for (InfoProducer infoProducer : getProducers(typeId)) {
+                result.add(infoProducer.getId());
+            }
 
-        return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
+            return new ResponseEntity<>(gson.toJson(result), HttpStatus.OK);
+        } catch (Exception e) {
+            return ErrorResponse.create(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private Collection<InfoProducer> getProducers(String typeId) throws ServiceException {

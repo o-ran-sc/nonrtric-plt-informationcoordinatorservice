@@ -106,10 +106,7 @@ public class ProducerCallbacks {
     }
 
     public Mono<String> startInfoJob(InfoProducer producer, InfoJob infoJob, Retry retrySpec) {
-        ProducerJobInfo request = new ProducerJobInfo(infoJob);
-        String body = gson.toJson(request);
-
-        return restClient.post(producer.getJobCallbackUrl(), body) //
+        return restClient.post(producer.getJobCallbackUrl(), jobCallbackBody(infoJob)) //
             .retryWhen(retrySpec) //
             .doOnNext(resp -> logger.debug("Job subscription {} started OK {}", infoJob.getId(), producer.getId())) //
             .onErrorResume(throwable -> {
@@ -119,6 +116,11 @@ public class ProducerCallbacks {
                 return Mono.empty();
             }) //
             .doOnNext(resp -> producer.setJobEnabled(infoJob));
+    }
+
+    private String jobCallbackBody(InfoJob infoJob) {
+        ProducerJobInfo request = new ProducerJobInfo(infoJob);
+        return gson.toJson(request);
     }
 
     private Collection<InfoProducer> getProducersForJob(InfoType type, InfoProducers infoProducers) {
