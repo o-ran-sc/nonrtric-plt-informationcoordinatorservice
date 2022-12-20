@@ -43,7 +43,9 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.oransc.ics.clients.AsyncRestClient;
 import org.oransc.ics.clients.AsyncRestClientFactory;
 import org.oransc.ics.clients.SecurityContext;
@@ -97,11 +99,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @TestPropertySource(
     properties = { //
@@ -1275,6 +1279,26 @@ class ApplicationTest {
         headers = this.producerSimulator.getTestResults().receivedHeaders.get(1);
         assertThat(headers).containsEntry("authorization", "Bearer " + AUTH_TOKEN);
 
+    }
+
+    @Test
+    @SuppressWarnings("squid:S2925") // "Thread.sleep" should not be used in tests.
+    void testZZActuator() throws Exception {
+        // The test must be run last, hence the "ZZ" in the name. All succeeding tests
+        // will fail.
+        AsyncRestClient client = restClient();
+        client.post("/actuator/loggers/org.oransc.ics", "{\"configuredLevel\":\"trace\"}").block();
+        String resp = client.get("/actuator/loggers/org.oransc.ics").block();
+        assertThat(resp).contains("TRACE");
+        client.post("/actuator/loggers/org.springframework.boot.actuate", "{\"configuredLevel\":\"trace\"}").block();
+        // This will stop the web server and all coming tests will fail.
+        client.post("/actuator/shutdown", "").block();
+        Thread.sleep(1000);
+
+        StepVerifier.create(restClient().get(ConsumerConsts.API_ROOT + "/info-jobs")) // Any call
+            .expectSubscription() //
+            .expectErrorMatches(t -> t instanceof WebClientRequestException) //
+            .verify();
     }
 
     private String typeSubscriptionUrl() {
