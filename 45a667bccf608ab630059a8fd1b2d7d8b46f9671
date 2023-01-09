@@ -22,6 +22,30 @@
       },
       "revId": "45a667bccf608ab630059a8fd1b2d7d8b46f9671",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cadd37fc_2437f240",
+        "filename": "config/application.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2023-01-09T09:21:20Z",
+      "side": 1,
+      "message": "It is for graceful shoutdown (not only for test). It should be protected so that only a systemn adm can call it (actually only the cubernetes shutdown hook should  call it).",
+      "parentUuid": "8497b743_b531421b",
+      "range": {
+        "startLine": 34,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 19
+      },
+      "revId": "45a667bccf608ab630059a8fd1b2d7d8b46f9671",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
