@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.info.License;
         version = "1.0", //
         description = SwaggerConfig.DESCRIPTION, //
         license = @License(
-            name = "Copyright (C) 2020-2022 Nordix Foundation. Licensed under the Apache License.",
+            name = "Copyright (C) 2020-2023 Nordix Foundation. Licensed under the Apache License.",
             url = "http://www.apache.org/licenses/LICENSE-2.0")))
 public class SwaggerConfig {
     private SwaggerConfig() {
