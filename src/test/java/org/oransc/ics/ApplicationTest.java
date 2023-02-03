@@ -96,6 +96,7 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -1419,7 +1420,7 @@ class ApplicationTest {
         return this.infoJobs.getJob(jobId);
     }
 
-    private HttpStatus putInfoType(String infoTypeId)
+    private HttpStatusCode putInfoType(String infoTypeId)
         throws JsonMappingException, JsonProcessingException, ServiceException {
         String url = ProducerConsts.API_ROOT + "/info-types/" + infoTypeId;
         String body = gson.toJson(ProducerInfoTypeRegistrationInfo(infoTypeId));
