@@ -24,7 +24,7 @@ info:
     added and removed information types.</li></ul></p><h4>Service status</h4><p>  This
     API provides a means to monitor the health of this service.</p>
   license:
-    name: Copyright (C) 2020-2022 Nordix Foundation. Licensed under the Apache License.
+    name: Copyright (C) 2020-2023 Nordix Foundation. Licensed under the Apache License.
     url: http://www.apache.org/licenses/LICENSE-2.0
   version: "1.0"
 servers:
@@ -73,12 +73,21 @@ paths:
       tags:
       - Actuator
       summary: Actuator web endpoint 'threaddump'
-      operationId: threaddump_2
+      operationId: threaddump
       responses:
         200:
           description: OK
           content:
-            '*/*':
+            text/plain;charset=UTF-8:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /A1-EI/v1/eitypes/{eiTypeId}:
@@ -330,7 +339,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/health/**:
@@ -343,7 +358,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /data-consumer/v1/info-types:
@@ -393,7 +414,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator/metrics/{requiredMetricName}:
@@ -414,7 +441,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /actuator:
@@ -427,7 +460,21 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/Link'
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/Link'
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
                 additionalProperties:
@@ -494,29 +541,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MonoResponseEntityObject'
+                type: object
   /actuator/loggers/{name}:
     get:
-      tags:
-      - Actuator
-      summary: Actuator web endpoint 'loggers-name'
-      operationId: loggers-name_2
-      parameters:
-      - name: name
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      responses:
-        200:
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: object
-    post:
       tags:
       - Actuator
       summary: Actuator web endpoint 'loggers-name'
@@ -529,6 +556,45 @@ paths:
         explode: false
         schema:
           type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
+              schema:
+                type: object
+    post:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'loggers-name'
+      operationId: loggers-name_2
+      parameters:
+      - name: name
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              enum:
+              - TRACE
+              - DEBUG
+              - INFO
+              - WARN
+              - ERROR
+              - FATAL
+              - OFF
       responses:
         200:
           description: OK
@@ -671,7 +737,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /example-dataconsumer/info-jobs/{infoJobId}/status:
@@ -713,7 +785,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /A1-EI/v1/eitypes:
@@ -994,7 +1072,7 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            text/plain;charset=UTF-8:
               schema:
                 type: object
   /data-consumer/v1/info-jobs/{infoJobId}:
@@ -1170,7 +1248,13 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/vnd.spring-boot.actuator.v3+json:
+              schema:
+                type: object
+            application/json:
+              schema:
+                type: object
+            application/vnd.spring-boot.actuator.v2+json:
               schema:
                 type: object
   /A1-EI/v1/eijobs:
@@ -1272,7 +1356,7 @@ paths:
         200:
           description: OK
           content:
-            '*/*':
+            application/octet-stream:
               schema:
                 type: object
 components:
@@ -1303,8 +1387,6 @@ components:
     EiTypeObject:
       type: object
       description: Information for an EI type
-    MonoResponseEntityObject:
-      type: object
     authorization_result:
       required:
       - result
