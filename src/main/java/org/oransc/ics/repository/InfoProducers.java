@@ -33,13 +33,11 @@ import org.oransc.ics.exceptions.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 
 /**
  * Dynamic representation of all EiProducers.
  */
 @SuppressWarnings("squid:S2629") // Invoke method(s) only conditionally
-@Component
 public class InfoProducers {
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private final Map<String, InfoProducer> allInfoProducers = new HashMap<>();

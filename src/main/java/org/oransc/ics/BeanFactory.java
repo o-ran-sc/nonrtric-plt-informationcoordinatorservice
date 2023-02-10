@@ -27,8 +27,10 @@ import java.lang.invoke.MethodHandles;
 import org.apache.catalina.connector.Connector;
 import org.oransc.ics.clients.SecurityContext;
 import org.oransc.ics.configuration.ApplicationConfig;
+import org.oransc.ics.controllers.a1e.A1eCallbacks;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.repository.InfoJobs;
+import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoTypeSubscriptions;
 import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
@@ -101,6 +103,12 @@ class BeanFactory {
             producerCallbacks = new ProducerCallbacks(getApplicationConfig(), securityContext);
         }
         return this.producerCallbacks;
+    }
+
+    @Bean
+    public InfoProducers getInfoProducers(ProducerCallbacks producerCallbacks, A1eCallbacks consumerCallbacks,
+        InfoJobs infoJobs, InfoTypes infoTypes) {
+        return new InfoProducers(producerCallbacks, consumerCallbacks, infoJobs, infoTypes);
     }
 
     @Bean

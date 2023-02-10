@@ -383,6 +383,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Void'
+  /actuator/shutdown:
+    post:
+      tags:
+      - Actuator
+      summary: Actuator web endpoint 'shutdown'
+      operationId: shutdown
+      responses:
+        200:
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
   /actuator/metrics/{requiredMetricName}:
     get:
       tags:
