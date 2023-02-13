@@ -1,10 +1,10 @@
 ---
 distribution_type: container
-container_release_tag: 1.4.0
+container_release_tag: 1.4.1
 container_pull_registry: nexus3.o-ran-sc.org:10004
 container_push_registry: nexus3.o-ran-sc.org:10002
 project: informationcoordinatorservice
-ref: a18d40cef8ec6a2b709f3f280a6017eca06d5f92
+ref: 88d81a5b7d15e68bbb2e0ea7c05203bfc1afd11f
 containers:
     - name: nonrtric-plt-informationcoordinatorservice
-      version: 1.4.0
+      version: 1.4.1
