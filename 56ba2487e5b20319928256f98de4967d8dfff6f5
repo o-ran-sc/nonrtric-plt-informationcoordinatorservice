@@ -22,6 +22,30 @@
       },
       "revId": "56ba2487e5b20319928256f98de4967d8dfff6f5",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1f5fadb_a0d4362e",
+        "filename": ".releases/maven-release.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1001106
+      },
+      "writtenOn": "2023-02-13T11:22:07Z",
+      "side": 1,
+      "message": "Done, I used https://jenkins.o-ran-sc.org/view/nonrtric-plt-informationcoordinatorservice/job/nonrtric-plt-informationcoordinatorservice-maven-stage-g-release/37/",
+      "parentUuid": "ca400816_cf7abec1",
+      "range": {
+        "startLine": 5,
+        "startChar": 71,
+        "endLine": 5,
+        "endChar": 74
+      },
+      "revId": "56ba2487e5b20319928256f98de4967d8dfff6f5",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
