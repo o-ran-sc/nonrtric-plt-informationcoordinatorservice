@@ -211,7 +211,7 @@ G Maintenance Release
 |                             |                                                   |
 +-----------------------------+---------------------------------------------------+
 | **Repo/commit-ID**          | nonrtric/plt/informationcoordinatorservice/       |
-|                             | 45a667bccf608ab630059a8fd1b2d7d8b46f9671          |
+|                             | 88d81a5b7d15e68bbb2e0ea7c05203bfc1afd11f          |
 |                             |                                                   |
 +-----------------------------+---------------------------------------------------+
 | **Release designation**     | G                                                 |
