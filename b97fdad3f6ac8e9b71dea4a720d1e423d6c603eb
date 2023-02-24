@@ -56,6 +56,23 @@
       "message": "Verify will work soon. \nWaiting on merge in ci-management to configure jenkins job. \nRef successful run with this patchset at: https://jenkins.o-ran-sc.org/sandbox/view/All/job/nonrtric-plt-informationcoordinatorservice-maven-docker-verify-master-mvn36-openjdk17/2/ ",
       "revId": "b97fdad3f6ac8e9b71dea4a720d1e423d6c603eb",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3219290_d489c494",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000103
+      },
+      "writtenOn": "2023-02-24T17:04:25Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "b97fdad3f6ac8e9b71dea4a720d1e423d6c603eb",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
