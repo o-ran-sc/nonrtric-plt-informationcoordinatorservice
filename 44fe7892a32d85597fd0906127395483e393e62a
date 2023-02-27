@@ -1,0 +1,7 @@
+Code-Review+2: Patrik Buhr <patrik.buhr@est.tech>
+Verified+1: ORAN Jobbuilder <releng+oran-jobbuilder@linuxfoundation.org>
+Submitted-by: Patrik Buhr <patrik.buhr@est.tech>
+Submitted-at: Mon, 27 Feb 2023 13:18:56 +0000
+Reviewed-on: https://gerrit.o-ran-sc.org/r/c/nonrtric/plt/informationcoordinatorservice/+/10374
+Project: nonrtric/plt/informationcoordinatorservice
+Branch: refs/heads/master
