@@ -50,7 +50,7 @@ public class ConsumerJobInfo {
 
     @Schema(name = "job_result_uri", description = "The target URI of the subscribed information", required = true)
     @SerializedName("job_result_uri")
-    @JsonProperty(value = "job_result_uri", required = true)
+    @JsonProperty(value = "job_result_uri", required = false)
     public String jobResultUri = "";
 
     @Schema(

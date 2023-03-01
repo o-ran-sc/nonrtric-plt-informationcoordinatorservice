@@ -21,8 +21,11 @@
 package org.oransc.ics;
 
 import org.junit.jupiter.api.Test;
+import org.oransc.ics.repository.InfoJobs;
+import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -42,12 +45,26 @@ class MockInformationService {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    InfoTypes infoTypes;
+
+    @Autowired
+    InfoJobs infoJobs;
+
     @Test
     @SuppressWarnings("squid:S2699")
     void runMock() throws Exception {
         logger.warn("**************** Keeping server alive! " + this.port);
         synchronized (this) {
-            this.wait();
+            while (true) {
+                System.out.println("**** Types *** ");
+                this.infoTypes.getAllInfoTypes().forEach(type -> System.out.println("  " + type.getId()));
+                System.out.println("**** Jobs *** ");
+                this.infoJobs.getJobs()
+                    .forEach(job -> System.out.println("  id: " + job.getId() + ", type:" + job.getType().getId()));
+                Thread.sleep(1000 * 60);
+
+            }
         }
     }
 }
