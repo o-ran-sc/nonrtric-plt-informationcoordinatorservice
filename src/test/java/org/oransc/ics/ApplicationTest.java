@@ -191,6 +191,7 @@ class ApplicationTest {
         this.securityContext.setAuthTokenFilePath(null);
         this.applicationConfig.setAuthAgentUrl("");
         this.openPolicyAgentSimulatorController.getTestResults().reset();
+        this.applicationConfig.setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_AUTH_URL);
     }
 
     @AfterEach
@@ -1228,7 +1229,7 @@ class ApplicationTest {
     }
 
     @Test
-    void testAuthorization() throws Exception {
+    void testFineGrainedAuthorizationCheck() throws Exception {
         this.applicationConfig.setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_AUTH_URL);
         final String AUTH_TOKEN = "testToken";
         Path authFile = Files.createTempFile("icsTestAuthToken", ".txt");
@@ -1246,16 +1247,29 @@ class ApplicationTest {
         assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
         assertThat(authRequest.getInput().getInfoTypeId()).isEqualTo(TYPE_ID);
         assertThat(authRequest.getInput().getAuthToken()).isEqualTo(AUTH_TOKEN);
+    }
+
+    @Test
+    void testFineGrainedAuthorizationCheckRejections() throws Exception {
+        putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
+        putInfoJob(TYPE_ID, "jobId");
 
         // Test rejection from OPA
         this.applicationConfig
             .setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_REJECT_AUTH_URL);
+        var testResults = openPolicyAgentSimulatorController.getTestResults();
 
         String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
         testErrorCode(restClient().delete(url), HttpStatus.UNAUTHORIZED, "Not authorized");
         assertThat(testResults.receivedRequests).hasSize(2);
-        authRequest = testResults.receivedRequests.get(1);
+        SubscriptionAuthRequest authRequest = testResults.receivedRequests.get(1);
         assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
+
+        String body = gson.toJson(consumerJobInfo(TYPE_ID, "jobId", "owner"));
+        testErrorCode(restClient().put(url, body), HttpStatus.UNAUTHORIZED, "Not authorized");
+
+        testErrorCode(restClient().get(url), HttpStatus.UNAUTHORIZED, "Not authorized");
+
     }
 
     @Test
