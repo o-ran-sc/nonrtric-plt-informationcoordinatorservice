@@ -202,7 +202,7 @@ public class A1eController {
         @RequestHeader Map<String, String> headers) {
 
         return this.infoJobs.getJobMono(eiJobId)
-            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.READ)) //
+            .flatMap(job -> authorization.doAccessControl(headers, job, AccessType.READ)) //
             .map(job -> new ResponseEntity<Object>(gson.toJson(toEiJobInfo(job)), HttpStatus.OK))
             .onErrorResume(ErrorResponse::createMono);
     }
@@ -258,7 +258,7 @@ public class A1eController {
         @RequestHeader Map<String, String> headers) {
 
         return this.infoJobs.getJobMono(eiJobId)
-            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .flatMap(job -> authorization.doAccessControl(headers, job, AccessType.WRITE)) //
             .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers))
             .map(x -> new ResponseEntity<>(HttpStatus.NO_CONTENT)).onErrorResume(ErrorResponse::createMono);
     }
@@ -299,7 +299,7 @@ public class A1eController {
         try {
             InfoType eiType = this.infoTypes.getCompatibleType(eiJobObject.eiTypeId);
 
-            return authorization.authorizeDataJob(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
+            return authorization.doAccessControl(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
                 .flatMap(x -> validatePutEiJob(eiJobId, eiType, eiJobObject)) //
                 .flatMap(job -> startEiJob(job, eiType)) //
                 .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //

@@ -122,7 +122,7 @@ class ApplicationTest {
     private final String TYPE_ID = "typeId_1.9.9";
     private final String PRODUCER_ID = "producerId";
     private final String EI_JOB_PROPERTY = "\"property1\"";
-    private final String EI_JOB_ID = "jobId";
+    private final String JOB_ID = "jobId";
 
     @Autowired
     ApplicationContext context;
@@ -191,6 +191,7 @@ class ApplicationTest {
         this.securityContext.setAuthTokenFilePath(null);
         this.applicationConfig.setAuthAgentUrl("");
         this.openPolicyAgentSimulatorController.getTestResults().reset();
+        this.applicationConfig.setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_AUTH_URL);
     }
 
     @AfterEach
@@ -491,7 +492,7 @@ class ApplicationTest {
         InfoJob job = this.infoJobs.getJob("jobId");
         assertThat(job.getOwner()).isEqualTo("owner");
 
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
     }
 
     @Test
@@ -510,8 +511,8 @@ class ApplicationTest {
         putInfoProducerWithOneType(REG_TYPE_ID4, REG_TYPE_ID4);
         putInfoProducerWithOneType(REG_TYPE_ID5, REG_TYPE_ID5);
 
-        String url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
-        String body = gson.toJson(eiJobInfo(PUT_TYPE_ID, EI_JOB_ID));
+        String url = A1eConsts.API_ROOT + "/eijobs/" + JOB_ID;
+        String body = gson.toJson(eiJobInfo(PUT_TYPE_ID, JOB_ID));
         ResponseEntity<String> resp = restClient().putForEntity(url, body).block();
         assertThat(this.infoJobs.size()).isEqualTo(1);
         assertThat(this.infoJobs.getJobs().iterator().next().getType().getId()).isEqualTo(REG_TYPE_ID1);
@@ -529,14 +530,14 @@ class ApplicationTest {
         final String REG_TYPE_ID1 = "type_1.5.0"; // Compatible
         putInfoProducerWithOneType(REG_TYPE_ID1, REG_TYPE_ID1);
 
-        String body = gson.toJson(eiJobInfo("junkTypeId", EI_JOB_ID));
+        String body = gson.toJson(eiJobInfo("junkTypeId", JOB_ID));
 
         String url = A1eConsts.API_ROOT + "/eijobs/jobId";
         testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
 
-        url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
+        url = A1eConsts.API_ROOT + "/eijobs/" + JOB_ID;
         final String PUT_TYPE_ERROR_ID = "type_1.1";
-        body = gson.toJson(eiJobInfo(PUT_TYPE_ERROR_ID, EI_JOB_ID));
+        body = gson.toJson(eiJobInfo(PUT_TYPE_ERROR_ID, JOB_ID));
         testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
     }
 
@@ -561,7 +562,7 @@ class ApplicationTest {
         InfoJob job = this.infoJobs.getJob("jobId");
         assertThat(job.getOwner()).isEqualTo("owner");
 
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
 
         body = gson.toJson(consumerJobInfo("junkTypeId", "jobId", ""));
         testErrorCode(restClient().put(url, body), HttpStatus.NOT_FOUND, "not found");
@@ -603,7 +604,7 @@ class ApplicationTest {
         // the principles for backwards compability.
         assertThat(request.typeId.equals(REG_TYPE_ID1) || request.typeId.equals(REG_TYPE_ID2)).isTrue();
 
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
 
         // Test update job
         resp = restClient().putForEntity(url, body).block();
@@ -717,7 +718,7 @@ class ApplicationTest {
     void producerDeleteTypeExistingJob() throws Exception {
         putInfoType(TYPE_ID);
         String url = ProducerConsts.API_ROOT + "/info-types/" + TYPE_ID;
-        putInfoJob(TYPE_ID, EI_JOB_ID);
+        putInfoJob(TYPE_ID, JOB_ID);
         restClient().delete(url).block();
         assertThat(this.infoTypes.size()).isZero();
 
@@ -728,7 +729,7 @@ class ApplicationTest {
     @Test
     void producerPutProducerWithOneType_rejecting() throws Exception {
         putInfoProducerWithOneTypeRejecting("simulateProducerError", TYPE_ID);
-        String url = A1eConsts.API_ROOT + "/eijobs/" + EI_JOB_ID;
+        String url = A1eConsts.API_ROOT + "/eijobs/" + JOB_ID;
         String body = gson.toJson(eiJobInfo());
         restClient().put(url, body).block();
 
@@ -737,7 +738,7 @@ class ApplicationTest {
         await().untilAsserted(() -> assertThat(simulatorResults.noOfRejectedCreate).isEqualTo(2));
         assertThat(simulatorResults.noOfRejectedCreate).isEqualTo(2);
 
-        verifyJobStatus(EI_JOB_ID, "DISABLED");
+        verifyJobStatus(JOB_ID, "DISABLED");
     }
 
     @Test
@@ -898,18 +899,18 @@ class ApplicationTest {
 
         // Create a job
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
-        putInfoJob(TYPE_ID, EI_JOB_ID);
+        putInfoJob(TYPE_ID, JOB_ID);
 
         // change the type for the producer, the job shall be disabled
         putInfoProducerWithOneType(PRODUCER_ID, "junk");
-        verifyJobStatus(EI_JOB_ID, "DISABLED");
+        verifyJobStatus(JOB_ID, "DISABLED");
         A1eCallbacksSimulatorController.TestResults consumerCalls = this.a1eCallbacksSimulator.getTestResults();
         await().untilAsserted(() -> assertThat(consumerCalls.eiJobStatusCallbacks).hasSize(1));
         assertThat(consumerCalls.eiJobStatusCallbacks.get(0).state)
             .isEqualTo(A1eEiJobStatus.EiJobStatusValues.DISABLED);
 
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
         await().untilAsserted(() -> assertThat(consumerCalls.eiJobStatusCallbacks).hasSize(2));
         assertThat(consumerCalls.eiJobStatusCallbacks.get(1).state).isEqualTo(A1eEiJobStatus.EiJobStatusValues.ENABLED);
     }
@@ -951,14 +952,14 @@ class ApplicationTest {
         {
             // Create a job
             putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
-            putInfoJob(TYPE_ID, EI_JOB_ID);
-            verifyJobStatus(EI_JOB_ID, "ENABLED");
+            putInfoJob(TYPE_ID, JOB_ID);
+            verifyJobStatus(JOB_ID, "ENABLED");
             deleteInfoProducer(PRODUCER_ID);
             // A Job disabled status notification shall now be received
             await().untilAsserted(() -> assertThat(consumerResults.eiJobStatusCallbacks).hasSize(1));
             assertThat(consumerResults.eiJobStatusCallbacks.get(0).state)
                 .isEqualTo(A1eEiJobStatus.EiJobStatusValues.DISABLED);
-            verifyJobStatus(EI_JOB_ID, "DISABLED");
+            verifyJobStatus(JOB_ID, "DISABLED");
         }
 
         assertThat(this.infoProducers.size()).isEqualTo(1);
@@ -983,7 +984,7 @@ class ApplicationTest {
         await().untilAsserted(() -> assertThat(consumerResults.eiJobStatusCallbacks).hasSize(2));
         assertThat(consumerResults.eiJobStatusCallbacks.get(1).state)
             .isEqualTo(A1eEiJobStatus.EiJobStatusValues.ENABLED);
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
     }
 
     @Test
@@ -992,15 +993,15 @@ class ApplicationTest {
         // suceeded
 
         putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
-        putInfoJob(TYPE_ID, EI_JOB_ID);
+        putInfoJob(TYPE_ID, JOB_ID);
 
         InfoProducer producer = this.infoProducers.getProducer(PRODUCER_ID);
-        InfoJob job = this.infoJobs.getJob(EI_JOB_ID);
+        InfoJob job = this.infoJobs.getJob(JOB_ID);
         // Pretend that the producer did reject the job and the a DISABLED notification
         // is sent for the job
         producer.setJobDisabled(job);
         job.setLastReportedStatus(false);
-        verifyJobStatus(EI_JOB_ID, "DISABLED");
+        verifyJobStatus(JOB_ID, "DISABLED");
 
         // Run the supervision and wait for the job to get started in the producer
         this.producerSupervision.createTask().blockLast();
@@ -1008,7 +1009,7 @@ class ApplicationTest {
         await().untilAsserted(() -> assertThat(consumerResults.eiJobStatusCallbacks).hasSize(1));
         assertThat(consumerResults.eiJobStatusCallbacks.get(0).state)
             .isEqualTo(A1eEiJobStatus.EiJobStatusValues.ENABLED);
-        verifyJobStatus(EI_JOB_ID, "ENABLED");
+        verifyJobStatus(JOB_ID, "ENABLED");
     }
 
     @Test
@@ -1228,7 +1229,7 @@ class ApplicationTest {
     }
 
     @Test
-    void testAuthorization() throws Exception {
+    void testFineGrainedAuthorizationCheck() throws Exception {
         this.applicationConfig.setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_AUTH_URL);
         final String AUTH_TOKEN = "testToken";
         Path authFile = Files.createTempFile("icsTestAuthToken", ".txt");
@@ -1246,16 +1247,39 @@ class ApplicationTest {
         assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
         assertThat(authRequest.getInput().getInfoTypeId()).isEqualTo(TYPE_ID);
         assertThat(authRequest.getInput().getAuthToken()).isEqualTo(AUTH_TOKEN);
+    }
+
+    @Test
+    void testFineGrainedAuthorizationCheckRejections() throws Exception {
+        putInfoProducerWithOneType(PRODUCER_ID, TYPE_ID);
+        putInfoJob(TYPE_ID, JOB_ID);
 
         // Test rejection from OPA
         this.applicationConfig
             .setAuthAgentUrl(baseUrl() + OpenPolicyAgentSimulatorController.SUBSCRIPTION_REJECT_AUTH_URL);
+        var testResults = openPolicyAgentSimulatorController.getTestResults();
 
-        String url = ConsumerConsts.API_ROOT + "/info-jobs/jobId";
+        // R1
+        String url = ConsumerConsts.API_ROOT + "/info-jobs/" + JOB_ID;
         testErrorCode(restClient().delete(url), HttpStatus.UNAUTHORIZED, "Not authorized");
         assertThat(testResults.receivedRequests).hasSize(2);
-        authRequest = testResults.receivedRequests.get(1);
+        SubscriptionAuthRequest authRequest = testResults.receivedRequests.get(1);
         assertThat(authRequest.getInput().getAccessType()).isEqualTo(AccessType.WRITE);
+
+        String body = gson.toJson(consumerJobInfo(TYPE_ID, JOB_ID, "owner"));
+        testErrorCode(restClient().put(url, body), HttpStatus.UNAUTHORIZED, "Not authorized");
+
+        testErrorCode(restClient().get(url), HttpStatus.UNAUTHORIZED, "Not authorized");
+
+        // A1-E
+        url = A1eConsts.API_ROOT + "/eijobs/" + JOB_ID;
+        testErrorCode(restClient().get(url), HttpStatus.UNAUTHORIZED, "Not authorized");
+
+        testErrorCode(restClient().delete(url), HttpStatus.UNAUTHORIZED, "Not authorized");
+
+        body = gson.toJson(eiJobInfo(TYPE_ID, JOB_ID, "owner"));
+        testErrorCode(restClient().put(url, body), HttpStatus.UNAUTHORIZED, "Not authorized");
+
     }
 
     @Test
@@ -1344,7 +1368,7 @@ class ApplicationTest {
     }
 
     private ConsumerJobInfo consumerJobInfo() throws JsonMappingException, JsonProcessingException {
-        return consumerJobInfo(TYPE_ID, EI_JOB_ID, "owner");
+        return consumerJobInfo(TYPE_ID, JOB_ID, "owner");
     }
 
     ConsumerJobInfo consumerJobInfo(String typeId, String infoJobId, String owner)
@@ -1354,7 +1378,7 @@ class ApplicationTest {
     }
 
     private A1eEiJobInfo eiJobInfo() throws Exception {
-        return eiJobInfo(TYPE_ID, EI_JOB_ID);
+        return eiJobInfo(TYPE_ID, JOB_ID);
     }
 
     A1eEiJobInfo eiJobInfo(String typeId, String infoJobId) throws Exception {
