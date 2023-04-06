@@ -205,7 +205,7 @@ public class ConsumerController {
         return Flux.fromIterable(this.infoJobs.getJobsForOwner(owner))
             .doOnNext(job -> logger.debug("DELETE info jobs, id: {}, type: {}, owner: {}", job.getId(),
                 job.getType().getId(), owner))
-            .flatMap(job -> this.authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .flatMap(job -> this.authorization.doAccessControl(headers, job, AccessType.WRITE)) //
             .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers)) //
             .collectList() //
             .map(l -> new ResponseEntity<>(HttpStatus.NO_CONTENT)) //
@@ -231,7 +231,7 @@ public class ConsumerController {
 
         logger.debug("GET info job, id: {}", infoJobId);
         return this.infoJobs.getJobMono(infoJobId) //
-            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.READ)) //
+            .flatMap(job -> authorization.doAccessControl(headers, job, AccessType.READ)) //
             .map(job -> new ResponseEntity<Object>(gson.toJson(toInfoJobInfo(job)), HttpStatus.OK)) //
             .onErrorResume(ErrorResponse::createMono);
     }
@@ -294,7 +294,7 @@ public class ConsumerController {
 
         logger.debug("DELETE info job, id: {}", jobId);
         return this.infoJobs.getJobMono(jobId) //
-            .flatMap(job -> authorization.authorizeDataJob(headers, job, AccessType.WRITE)) //
+            .flatMap(job -> authorization.doAccessControl(headers, job, AccessType.WRITE)) //
             .doOnNext(job -> this.infoJobs.remove(job, this.infoProducers)) //
             .map(job -> new ResponseEntity<>(HttpStatus.NO_CONTENT)) //
             .onErrorResume(ErrorResponse::createMono);
@@ -339,7 +339,7 @@ public class ConsumerController {
             InfoType infoType = this.infoTypes.getCompatibleType(informationJobObject.infoTypeId);
 
             return authorization
-                .authorizeDataJob(headers, infoType, informationJobObject.jobDefinition, AccessType.WRITE) //
+                .doAccessControl(headers, infoType, informationJobObject.jobDefinition, AccessType.WRITE) //
                 .flatMap(x -> validatePutInfoJob(jobId, infoType, informationJobObject)) //
                 .flatMap(job -> startInfoSubscriptionJob(job, infoType)) //
                 .doOnNext(this.infoJobs::put) //

@@ -53,6 +53,26 @@ tags:
   description: API used for authorization of information job access (this is provided
     by an authorization producer such as OPA)
 paths:
+  /example-authz-check:
+    post:
+      tags:
+      - Authorization API
+      summary: Request for access authorization.
+      description: The authorization function decides if access is granted.
+      operationId: subscriptionAuth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/subscription_authorization'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/authorization_result'
   /data-producer/v1/info-types:
     get:
       tags:
@@ -1326,26 +1346,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /example-subscription-auth:
-    post:
-      tags:
-      - Authorization API
-      summary: Request for access authorization.
-      description: The authorization function decides if access is granted.
-      operationId: subscriptionAuth
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/subscription_authorization'
-        required: true
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/authorization_result'
   /actuator/heapdump:
     get:
       tags:
