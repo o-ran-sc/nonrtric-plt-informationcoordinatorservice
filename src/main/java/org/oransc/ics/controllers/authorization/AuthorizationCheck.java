@@ -56,12 +56,12 @@ public class AuthorizationCheck {
         this.restClient = restClientFactory.createRestClientUseHttpProxy("");
     }
 
-    public Mono<InfoJob> authorizeDataJob(Map<String, String> receivedHttpHeaders, InfoJob job, AccessType accessType) {
-        return authorizeDataJob(receivedHttpHeaders, job.getType(), job.getJobData(), accessType) //
+    public Mono<InfoJob> doAccessControl(Map<String, String> receivedHttpHeaders, InfoJob job, AccessType accessType) {
+        return doAccessControl(receivedHttpHeaders, job.getType(), job.getJobData(), accessType) //
             .map(x -> job);
     }
 
-    public Mono<InfoType> authorizeDataJob(Map<String, String> receivedHttpHeaders, InfoType type, Object jobDefinition,
+    public Mono<InfoType> doAccessControl(Map<String, String> receivedHttpHeaders, InfoType type, Object jobDefinition,
         AccessType accessType) {
         if (this.applicationConfig.getAuthAgentUrl().isEmpty()) {
             return Mono.just(type);

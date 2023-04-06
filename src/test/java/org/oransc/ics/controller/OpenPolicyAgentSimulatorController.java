@@ -59,8 +59,8 @@ public class OpenPolicyAgentSimulatorController {
 
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static final String SUBSCRIPTION_AUTH_URL = "/example-subscription-auth";
-    public static final String SUBSCRIPTION_REJECT_AUTH_URL = "/example-subscription-auth-reject";
+    public static final String SUBSCRIPTION_AUTH_URL = "/example-authz-check";
+    public static final String SUBSCRIPTION_REJECT_AUTH_URL = "/example-authz-check-reject";
 
     public static class TestResults {
 
@@ -93,7 +93,7 @@ public class OpenPolicyAgentSimulatorController {
     public ResponseEntity<Object> subscriptionAuth( //
         @RequestHeader Map<String, String> headers, //
         @RequestBody SubscriptionAuthRequest request) {
-        logger.info("Auth {}", request);
+        logger.debug("Auth {}", request);
         testResults.receivedRequests.add(request);
 
         String res = gson.toJson(AuthorizationResult.builder().result(true).build());
@@ -112,7 +112,7 @@ public class OpenPolicyAgentSimulatorController {
     public ResponseEntity<Object> subscriptionAuthReject( //
         @RequestHeader Map<String, String> headers, //
         @RequestBody SubscriptionAuthRequest request) {
-        logger.info("Auth Reject {}", request);
+        logger.debug("Auth Reject {}", request);
         testResults.receivedRequests.add(request);
         String res = gson.toJson(AuthorizationResult.builder().result(false).build());
         return new ResponseEntity<>(res, HttpStatus.OK);
