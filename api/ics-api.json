@@ -374,6 +374,20 @@
     }},
     "openapi": "3.0.1",
     "paths": {
+        "/example-authz-check": {"post": {
+            "summary": "Request for access authorization.",
+            "requestBody": {
+                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/subscription_authorization"}}},
+                "required": true
+            },
+            "description": "The authorization function decides if access is granted.",
+            "operationId": "subscriptionAuth",
+            "responses": {"200": {
+                "description": "OK",
+                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/authorization_result"}}}
+            }},
+            "tags": ["Authorization API"]
+        }},
         "/data-producer/v1/info-types": {"get": {
             "summary": "Info Type identifiers",
             "operationId": "getInfoTypdentifiers",
@@ -1358,20 +1372,6 @@
                 "required": true
             }],
             "tags": ["Data producer (registration)"]
-        }},
-        "/example-subscription-auth": {"post": {
-            "summary": "Request for access authorization.",
-            "requestBody": {
-                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/subscription_authorization"}}},
-                "required": true
-            },
-            "description": "The authorization function decides if access is granted.",
-            "operationId": "subscriptionAuth",
-            "responses": {"200": {
-                "description": "OK",
-                "content": {"application/json": {"schema": {"$ref": "#/components/schemas/authorization_result"}}}
-            }},
-            "tags": ["Authorization API"]
         }},
         "/actuator/heapdump": {"get": {
             "summary": "Actuator web endpoint 'heapdump'",
