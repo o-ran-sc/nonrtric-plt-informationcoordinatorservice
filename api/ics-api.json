@@ -240,7 +240,7 @@
             "required": ["info_job_identity"],
             "properties": {
                 "owner": {
-                    "description": "The owner of the job",
+                    "description": "The owner of the job. This is a string that indentifies the job owner, which could be an application, a POD or something else.",
                     "type": "string"
                 },
                 "last_updated": {
@@ -252,7 +252,7 @@
                     "type": "string"
                 },
                 "target_uri": {
-                    "description": "URI for the target of the produced Information",
+                    "description": "URI for the target of the produced Information. Note, this is deprecated and will be removed. The information on how the data is delivered is type specific and should be defined in the type specific info_job_data.",
                     "type": "string"
                 },
                 "info_job_data": {
