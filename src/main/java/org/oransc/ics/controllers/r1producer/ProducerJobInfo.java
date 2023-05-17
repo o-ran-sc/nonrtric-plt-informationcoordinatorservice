@@ -27,9 +27,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import org.oransc.ics.repository.InfoJob;
 
-@Schema(
-    name = "producer_info_job_request",
-    description = "The body of the Information Producer callbacks for Information Job creation and deletion")
+@Schema(name = "producer_info_job_request", description = "The body of the Information Producer callbacks for Information Job creation and deletion")
 public class ProducerJobInfo {
 
     @Schema(name = "info_job_identity", description = "Identity of the Information Job", required = true)
@@ -47,12 +45,12 @@ public class ProducerJobInfo {
     @JsonProperty("info_job_data")
     public Object jobData;
 
-    @Schema(name = "target_uri", description = "URI for the target of the produced Information")
+    @Schema(name = "target_uri", description = "URI for the target of the produced Information. Note, this is deprecated and will be removed. The information on how the data is delivered is type specific and should be defined in the type specific info_job_data.")
     @SerializedName("target_uri")
     @JsonProperty("target_uri")
     public String targetUri = "";
 
-    @Schema(name = "owner", description = "The owner of the job")
+    @Schema(name = "owner", description = "The owner of the job. This is a string that uniquely should indentity the job owner, which could be an application, a POD or something else.")
     @SerializedName("owner")
     @JsonProperty("owner")
     public String owner = "";
@@ -63,7 +61,7 @@ public class ProducerJobInfo {
     public String lastUpdated = "";
 
     public ProducerJobInfo(Object jobData, String id, String typeId, String targetUri, String owner,
-        String lastUpdated) {
+            String lastUpdated) {
         this.id = id;
         this.jobData = jobData;
         this.typeId = typeId;
@@ -74,7 +72,7 @@ public class ProducerJobInfo {
 
     public ProducerJobInfo(InfoJob job) {
         this(job.getJobData(), job.getId(), job.getType().getId(), job.getTargetUrl(), job.getOwner(),
-            job.getLastUpdated());
+                job.getLastUpdated());
     }
 
     public ProducerJobInfo() {
