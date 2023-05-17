@@ -41,6 +41,30 @@
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ec8b1e3_baf99a2f",
+        "filename": "api/ics-api.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2023-05-17T08:42:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d9ea08b_bfba7357",
+      "range": {
+        "startLine": 243,
+        "startChar": 89,
+        "endLine": 243,
+        "endChar": 105
+      },
+      "revId": "d57f78b5c9630a1327982a7e637300022cab8d36",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fe34a6e_a4170e5a",
@@ -64,6 +88,30 @@
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0ca9b94_ed246a4a",
+        "filename": "api/ics-api.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 1566,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2023-05-17T08:42:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fe34a6e_a4170e5a",
+      "range": {
+        "startLine": 1565,
+        "startChar": 76,
+        "endLine": 1566,
+        "endChar": 21
+      },
+      "revId": "d57f78b5c9630a1327982a7e637300022cab8d36",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "62ee7930_ba0eb8a7",
@@ -77,6 +125,30 @@
       "writtenOn": "2023-05-17T08:12:31Z",
       "side": 1,
       "message": "available",
+      "range": {
+        "startLine": 99,
+        "startChar": 109,
+        "endLine": 99,
+        "endChar": 117
+      },
+      "revId": "d57f78b5c9630a1327982a7e637300022cab8d36",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70fbd22a_39c31817",
+        "filename": "docs/overview.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1000262
+      },
+      "writtenOn": "2023-05-17T08:42:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62ee7930_ba0eb8a7",
       "range": {
         "startLine": 99,
         "startChar": 109,
