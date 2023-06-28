@@ -14,7 +14,7 @@ This product is a part of :doc:`NONRTRIC <nonrtric:index>`.
 The following terms are used:
 
 * **Data Consumer**, is a subscriber of data. Subscription is done by creating an "Information Job". A data consumer can for instance be an R-App (using the R1 API) or a NearRT-RIC consuming Enrichment Information (and uses the A1-EI API provided by this service).
-* **Information Type**, is a type of information. This defines an interface between consumers and producers. Each information type defines which parameters can be used for creating an information job. These parameters are defined by a Json schema connected to the Information Type. These parameters may for instance include:
+* **Information Type**, is a type of information. This defines an interface between consumers and producers. Each information type defines which parameters can be used for creating an information job. These parameters are defined by a Json schema connected to the Information Type. These parameters may include:
 
   * Parameters related to data delivery (for instance a callback URL if REST is used or a Kafka stream). These are different for different delivery protocols.
   * Filtering or other information for data selection.
@@ -23,16 +23,16 @@ The following terms are used:
 
 * **Data Producer** is a producer of data. A producer will get notified about all information jobs of its supported types. This also means that filtering is done at the producer (ideally at the source of the data). A data producer can for instance be an R-App.
 
-One information type can be supported by zero to many data producers and can be subscribed to by zero to many data consumers. For instance there can be two data producers for a type of data; one from one vendor (handling a part of the network) and another from another vendor. A data consumer is agnostic about this.
+One information type can be supported by zero to many data producers and can be subscribed to by zero to many data consumers. For example, there can be two data producers for a type of data; one from one vendor (handling a part of the network) and another from a different vendor. A data consumer is agnostic about this.
 
 .. image:: ./Architecture.png
    :width: 500pt
 
 Information Jobs and types are stored persistently by ICS in a local database. This can be either using Amazon S3 - Cloud Object Storage or file system.
 
-To restrict which data that can be consumed by by whom there is support for finegrained access control. When data subscriptions/jobs are modified or read, an access check can be performed.
+To restrict which data that can be consumed and by whom there is support for finegrained access control. When data subscriptions/jobs are modified or read, an access check can be performed.
 ICS can be configured to call an external authorizer.
-This can be for instance Open Policy Agent (OPA) which can grant or deny accesses based on an access token (JWT) used by the calling data consumer.
+For example, this can be Open Policy Agent (OPA) which can grant or deny accesses based on an access token (JWT) used by the calling data consumer.
 In addition to this the information type, accesstype (read/write) and all type specific parameters can be used by access rules.
 
 The URL to the authorization component is defined in the application.yaml file and the call invoked to by ICS is described in API documentation.
@@ -82,7 +82,7 @@ Key Requirements
   these versioning scenarios automatically.
 
 * A consumer shall be able to retrieve its jobs after a restart. Therefore it must be possible
-  to group the jobs based on a label "owner" which is define by the consumer. This must be unique,
+  to group the jobs based on a label "owner" which is defined by the consumer. This must be unique,
   which suggests that it should be based on UUIDS, but this is up to the consumer.
   This "owner" can be a POD, an application etc. ICS should not restrict that.
 
@@ -95,9 +95,9 @@ Summary of principles
 * Data filtering is done by the producer. ICS does not restrict how data selection/filtering is done.
 * A Data Consumer can create a data subscription (Information Job) regardless of the status of the data producers. The producers can come and go without any need for the Data Consumer to take any action.
   A subscription indicates the need for a type of data and the system should do its best to fulfill this.
-* ICS is by design not aware of any subscribeable data types.
-* When a consumer creates a subscription/jonb, ICS shall choose the information type version with the lowest available
-  compatible version. All producers that has registered a type that is compatible with the chosen version are included.
+* ICS is by design not aware of any subscribable data types.
+* When a consumer creates a subscription/job, ICS shall choose the information type version with the lowest available
+  compatible version. All producers that have registered a type that is compatible with the chosen version are included.
   Example, if a consumer creates a job with type version 1.1.0, the chosen type may 1.2.0 and a producer
   supporting version 1.9.0 will be included (but not a producer that supports version 2.0.0).
 
