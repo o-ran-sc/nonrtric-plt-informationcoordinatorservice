@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3993b96_de4f4380",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000103
+      },
+      "writtenOn": "2023-06-29T09:45:49Z",
+      "side": 1,
+      "message": "Please cherry pick this version to h-release branch. \nThanks.",
+      "revId": "401d44936e2e7ce4ff669bb8fa099cbb64dd7acc",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
