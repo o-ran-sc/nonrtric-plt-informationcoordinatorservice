@@ -1019,7 +1019,7 @@ class ApplicationTest {
 
         String url = "/status";
         ResponseEntity<String> resp = restClient().getForEntity(url).block();
-        assertThat(resp.getBody()).contains("hunky dory");
+        assertThat(resp.getBody()).contains("success");
     }
 
     @Test

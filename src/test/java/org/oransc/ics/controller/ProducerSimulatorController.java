@@ -190,7 +190,7 @@ public class ProducerSimulatorController {
         })
     public ResponseEntity<Object> producerSupervision() {
         logger.info("Producer supervision");
-        return new ResponseEntity<>("Hunky dory", HttpStatus.OK);
+        return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @GetMapping(path = SUPERVISION_ERROR_URL, produces = MediaType.APPLICATION_JSON_VALUE)
