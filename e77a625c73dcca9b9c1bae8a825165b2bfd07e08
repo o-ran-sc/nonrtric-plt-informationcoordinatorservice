@@ -1,0 +1,11 @@
+Code-Review+1: Kevin Timoney <kevin.timoney@est.tech>
+Verified+1: ORAN Required GHA <releng+oran.required.gha@linuxfoundation.org>
+Verified+1: ORAN Jobbuilder <releng+oran-jobbuilder@linuxfoundation.org>
+Code-Review+1: Denis G Noonan <denis.noonan@est.tech>
+Code-Review+2: John  Keeney <john.keeney@est.tech>
+Code-Review+1: Ambrish Singh <ambrish.singh@est.tech>
+Submitted-by: John  Keeney <john.keeney@est.tech>
+Submitted-at: Tue, 29 Aug 2023 13:02:04 +0000
+Reviewed-on: https://gerrit.o-ran-sc.org/r/c/nonrtric/plt/informationcoordinatorservice/+/11673
+Project: nonrtric/plt/informationcoordinatorservice
+Branch: refs/heads/master
