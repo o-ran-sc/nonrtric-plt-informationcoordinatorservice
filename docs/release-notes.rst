@@ -1,6 +1,7 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
-.. Copyright (C) 2021 Nordix
+.. Copyright (C) 2021 Nordix. All rights reserved
+.. Copyright (C) 2021 OpenInfra Foundation Europe. All rights reserved
 
 =============
 Release-Notes
@@ -45,6 +46,9 @@ Version history Information Coordinator Service
 |            |          |                  | Release            |
 +------------+----------+------------------+--------------------+
 | 2023-06-16 | 1.5.0    | John Keeney      | H Release          |
+|            |          |                  |                    |
++------------+----------+------------------+--------------------+
+| 2023-12-14 | 1.6.0    | John Keeney      | I Release          |
 |            |          |                  |                    |
 +------------+----------+------------------+--------------------+
 
@@ -249,3 +253,23 @@ H Release
 |                             |                                                   |
 +-----------------------------+---------------------------------------------------+
 
+I Release
+---------
++-----------------------------+---------------------------------------------------+
+| **Project**                 | Non-RT RIC Information Coordinator Service        |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Repo/commit-ID**          | nonrtric/plt/informationcoordinatorservice/       |
+|                             | d9f145a3945f0fe4c9f4d093c887f11476535113          |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Release designation**     | I                                                 |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Release date**            | 2023-12-14                                        |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Purpose of the delivery** | nonrtric-plt-informationcoordinatorservice:1.6.0  |
+|                             |    Minor improvements and stability updates       |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
