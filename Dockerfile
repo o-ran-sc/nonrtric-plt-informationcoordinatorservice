@@ -1,6 +1,7 @@
 #
 # ============LICENSE_START=======================================================
-#  Copyright (C) 2020 Nordix Foundation.
+#  Copyright (C) 2020-2023 Nordix Foundation.
+#  Coptyright (C) 2023-2025 OpenInfra Foundation Europe. All rights reserved.
 # ================================================================================
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +18,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # ============LICENSE_END=========================================================
 #
-FROM openjdk:17-jdk as jre-build
+FROM openjdk:17-jdk AS jre-build
 
-RUN $JAVA_HOME/bin/jlink \
+RUN "$JAVA_HOME"/bin/jlink \
 --verbose \
 --add-modules ALL-MODULE-PATH \
 --strip-debug \
@@ -40,25 +41,25 @@ COPY --from=jre-build /customjre $JAVA_HOME
 ARG JAR
 
 WORKDIR /opt/app/information-coordinator-service
-RUN mkdir -p /var/log/information-coordinator-service
-RUN mkdir -p /opt/app/information-coordinator-service/etc/cert/
-RUN mkdir -p /var/information-coordinator-service
+RUN mkdir -p /var/log/information-coordinator-service && \
+    mkdir -p /opt/app/information-coordinator-service/etc/cert/ && \
+    mkdir -p /var/information-coordinator-service/database
 
 EXPOSE 8083 8434
 
-ADD /config/application.yaml /opt/app/information-coordinator-service/config/application.yaml
-ADD target/${JAR} /opt/app/information-coordinator-service/information-coordinator-service.jar
-ADD /config/keystore.jks /opt/app/information-coordinator-service/etc/cert/keystore.jks
-ADD /config/truststore.jks /opt/app/information-coordinator-service/etc/cert/truststore.jks
+COPY /config/application.yaml /opt/app/information-coordinator-service/config/application.yaml
+COPY target/${JAR} /opt/app/information-coordinator-service/information-coordinator-service.jar
+COPY /config/keystore.jks /opt/app/information-coordinator-service/etc/cert/keystore.jks
+COPY /config/truststore.jks /opt/app/information-coordinator-service/etc/cert/truststore.jks
 
 ARG user=nonrtric
 ARG group=nonrtric
 
-RUN groupadd $user && \
-    useradd -r -g $group $user
-RUN chown -R $user:$group /opt/app/information-coordinator-service
-RUN chown -R $user:$group /var/log/information-coordinator-service
-RUN chown -R $user:$group /var/information-coordinator-service
+RUN groupadd "$user" && \
+    useradd -r -g "$group" "$user" && \
+    chown -R "$user":"$group" /opt/app/information-coordinator-service && \
+    chown -R "$user":"$group" /var/log/information-coordinator-service && \
+    chown -R "$user":"$group" /var/information-coordinator-service
 
 USER ${user}
 
