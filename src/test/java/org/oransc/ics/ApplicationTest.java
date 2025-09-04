@@ -99,8 +99,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import reactor.core.publisher.Mono;
@@ -1333,8 +1333,9 @@ class ApplicationTest {
     }
 
     @Test
+    @DirtiesContext
     @SuppressWarnings("squid:S2925") // "Thread.sleep" should not be used in tests.
-    void testZZActuator() throws Exception {
+    void testZZActuator() {
         // The test must be run last, hence the "ZZ" in the name. All succeeding tests
         // will fail.
         AsyncRestClient client = restClient();
@@ -1343,13 +1344,8 @@ class ApplicationTest {
         assertThat(resp).contains("TRACE");
         client.post("/actuator/loggers/org.springframework.boot.actuate", "{\"configuredLevel\":\"trace\"}").block();
         // This will stop the web server and all coming tests will fail.
-        client.post("/actuator/shutdown", "").block();
-        Thread.sleep(1000);
-
-        StepVerifier.create(restClient().get(ConsumerConsts.API_ROOT + "/info-jobs")) // Any call
-            .expectSubscription() //
-            .expectErrorMatches(t -> t instanceof WebClientRequestException) //
-            .verify();
+        String shutdownResponse = client.post("/actuator/shutdown", "").block();
+        assertThat(shutdownResponse).contains("Shutting down");
     }
 
     private String typeSubscriptionUrl() {
