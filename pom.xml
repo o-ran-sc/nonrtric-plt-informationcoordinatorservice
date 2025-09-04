@@ -4,7 +4,7 @@
 * O-RAN-SC
 * %%
 * Copyright (C) 2019-2023 Nordix Foundation. All rights reserved.
-* Copyright (C) 2023 OpenInfra Foundation Europe. All rights reserved.
+* Copyright (C) 2023-2025 OpenInfra Foundation Europe. All rights reserved.
 * %%
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0</version>
+        <version>3.5.5</version>
         <relativePath />
     </parent>
     <groupId>org.o-ran-sc.nonrtric.plt</groupId>
@@ -59,6 +59,7 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <springdoc.version>2.0.2</springdoc.version>
         <springdoc.openapi-ui.version>1.6.14</springdoc.openapi-ui.version>
+        <mockwebserver.version>5.1.0</mockwebserver.version>
         <exec.skip>true</exec.skip>
     </properties>
     <dependencies>
@@ -164,6 +165,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
+            <version>${mockwebserver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
