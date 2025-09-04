@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +38,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.net.ssl.KeyManagerFactory;
 
 import org.oransc.ics.configuration.WebClientConfig;
@@ -123,7 +123,7 @@ public class AsyncRestClientFactory {
             List<Certificate> certificateList = Collections.list(trustStore.aliases()).stream() //
                 .filter(alias -> isCertificateEntry(trustStore, alias)) //
                 .map(alias -> getCertificate(trustStore, alias)) //
-                .collect(Collectors.toList());
+                .toList();
             final X509Certificate[] certificates = certificateList.toArray(new X509Certificate[certificateList.size()]);
 
             return SslContextBuilder.forClient() //
@@ -136,7 +136,7 @@ public class AsyncRestClientFactory {
             try {
                 return trustStore.isCertificateEntry(alias);
             } catch (KeyStoreException e) {
-                logger.error("Error reading truststore {}", e.getMessage());
+                logger.error("Error reading truststore for certificate entry {}", e.getMessage());
                 return false;
             }
         }

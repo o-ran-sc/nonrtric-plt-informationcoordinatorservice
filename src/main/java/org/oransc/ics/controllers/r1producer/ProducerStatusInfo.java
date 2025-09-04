@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +34,12 @@ public class ProducerStatusInfo {
         ENABLED, DISABLED
     }
 
-    private static final String OPERATIONAL_STATE_DESCRIPTION = "Operational state, values:\n" //
-        + "ENABLED: the producer is operational\n" //
-        + "DISABLED: the producer is not operational";
+    private static final String OPERATIONAL_STATE_DESCRIPTION = """
+        Operational state, values:
+        ENABLED: the producer is operational
+        DISABLED: the producer is not operational""";
 
-    @Schema(name = "operational_state", description = OPERATIONAL_STATE_DESCRIPTION, required = true)
+    @Schema(name = "operational_state", description = OPERATIONAL_STATE_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("operational_state")
     @JsonProperty(value = "operational_state", required = true)
     public final OperationalState opState;

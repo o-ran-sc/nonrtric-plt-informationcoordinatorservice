@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
 import org.oransc.ics.exceptions.ServiceException;
@@ -54,7 +56,6 @@ import org.oransc.ics.repository.InfoTypeSubscriptions;
 import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,25 +67,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@SuppressWarnings("squid:S2629") // Invoke method(s) only conditionally
+@SuppressWarnings({"squid:S2629", "java:S6830"}) // Invoke method(s) only conditionally
 @RestController("Producer registry")
 @Tag(name = ProducerConsts.PRODUCER_API_NAME, description = ProducerConsts.PRODUCER_API_DESCRIPTION)
+@RequiredArgsConstructor
 public class ProducerController {
 
-    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private InfoJobs infoJobs;
+    private final InfoJobs infoJobs;
 
-    @Autowired
-    private InfoTypes infoTypes;
+    private final InfoTypes infoTypes;
 
-    @Autowired
-    private InfoProducers infoProducers;
+    private final InfoProducers infoProducers;
 
-    @Autowired
-    private InfoTypeSubscriptions typeSubscriptions;
+    private final InfoTypeSubscriptions typeSubscriptions;
 
     @GetMapping(path = ProducerConsts.API_ROOT + "/info-types", produces = MediaType.APPLICATION_JSON_VALUE) //
     @Operation(summary = "Info Type identifiers", description = "") //

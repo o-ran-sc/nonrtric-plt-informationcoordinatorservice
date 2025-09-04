@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2022 Nordix Foundation
+ * Copyright (C) 2022-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +43,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3AsyncClientBuilder;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
-import software.amazon.awssdk.services.s3.model.Delete;
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest;
 import software.amazon.awssdk.services.s3.model.DeleteBucketResponse;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -72,11 +72,10 @@ class S3ObjectStore implements DataStore {
         getS3AsynchClient(applicationConfig);
     }
 
-    private static synchronized S3AsyncClient getS3AsynchClient(ApplicationConfig applicationConfig) {
+    private static synchronized void getS3AsynchClient(ApplicationConfig applicationConfig) {
         if (applicationConfig.isS3Enabled() && s3AsynchClient == null) {
             s3AsynchClient = getS3AsyncClientBuilder(applicationConfig).build();
         }
-        return s3AsynchClient;
     }
 
     private static S3AsyncClientBuilder getS3AsyncClientBuilder(ApplicationConfig applicationConfig) {
@@ -168,13 +167,9 @@ class S3ObjectStore implements DataStore {
             oids.add(oid);
         }
 
-        Delete delete = Delete.builder() //
-            .objects(oids) //
-            .build();
-
         DeleteObjectsRequest request = DeleteObjectsRequest.builder() //
             .bucket(bucket()) //
-            .delete(delete) //
+            .delete(delete -> delete.objects(oids)) //
             .build();
 
         CompletableFuture<DeleteObjectsResponse> future = s3AsynchClient.deleteObjects(request);

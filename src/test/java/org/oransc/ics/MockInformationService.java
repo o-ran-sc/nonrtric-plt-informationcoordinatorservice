@@ -52,9 +52,9 @@ class MockInformationService {
     InfoJobs infoJobs;
 
     @Test
-    @SuppressWarnings("squid:S2699")
+    @SuppressWarnings({"squid:S2699", "squid:S2925" })
     void runMock() throws Exception {
-        logger.warn("**************** Keeping server alive! " + this.port);
+        logger.warn("**************** Keeping server alive! {}", this.port);
         synchronized (this) {
             while (true) {
                 System.out.println("**** Types *** ");

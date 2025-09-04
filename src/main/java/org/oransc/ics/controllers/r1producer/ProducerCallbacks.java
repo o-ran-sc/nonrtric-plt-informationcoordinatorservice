@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +28,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.Duration;
 import java.util.Collection;
 
+import java.util.List;
 import org.oransc.ics.clients.AsyncRestClient;
 import org.oransc.ics.clients.AsyncRestClientFactory;
 import org.oransc.ics.clients.SecurityContext;
@@ -50,7 +52,7 @@ import reactor.util.retry.Retry;
 public class ProducerCallbacks {
 
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     private final AsyncRestClient restClient;
 
@@ -87,14 +89,14 @@ public class ProducerCallbacks {
         return Flux.fromIterable(getProducersForJob(type, infoProducers)) //
             .flatMap(infoProducer -> startInfoJob(infoProducer, infoJob, retrySpec)) //
             .collectList() //
-            .map(okResponses -> Integer.valueOf(okResponses.size())); //
+            .map(List::size); //
     }
 
     /**
      * Start all jobs for one producer
      *
-     * @param producer
-     * @param infoJobs
+     * @param producer information producer
+     * @param infoJobs information jobs
      */
     public Flux<String> startInfoJobs(InfoProducer producer, InfoJobs infoJobs) {
         final int maxNoOfParalellRequests = 10;

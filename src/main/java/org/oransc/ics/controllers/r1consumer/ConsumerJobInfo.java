@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,33 +34,33 @@ public class ConsumerJobInfo {
     @Schema(
         name = "info_type_id",
         description = "Information type Idenitifier of the subscription job",
-        required = true)
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_type_id")
     @JsonProperty(value = "info_type_id", required = true)
     public String infoTypeId = "";
 
-    @Schema(name = "job_owner", description = "Identity of the owner of the job", required = true)
-    @SerializedName("job_owner")
-    @JsonProperty(value = "job_owner", required = true)
-    public String owner = "";
-
-    @Schema(name = "job_definition", description = "Information type specific job data", required = true)
-    @SerializedName("job_definition")
-    @JsonProperty(value = "job_definition", required = true)
-    public Object jobDefinition;
-
-    @Schema(name = "job_result_uri", description = "The target URI of the subscribed information", required = true)
+    @Schema(name = "job_result_uri", description = "The target URI of the subscribed information", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("job_result_uri")
     @JsonProperty(value = "job_result_uri", required = false)
     public String jobResultUri = "";
 
+    @Schema(name = "job_owner", description = "Identity of the owner of the job", requiredMode = Schema.RequiredMode.REQUIRED)
+    @SerializedName("job_owner")
+    @JsonProperty(value = "job_owner", required = true)
+    public String owner = "";
+
     @Schema(
         name = "status_notification_uri",
         description = "The target of Information subscription job status notifications",
-        required = false)
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @SerializedName("status_notification_uri")
     @JsonProperty(value = "status_notification_uri", required = false)
     public String statusNotificationUri = "";
+
+    @Schema(name = "job_definition", description = "Information type specific job data", requiredMode = Schema.RequiredMode.REQUIRED)
+    @SerializedName("job_definition")
+    @JsonProperty(value = "job_definition", required = true)
+    public Object jobDefinition;
 
     public ConsumerJobInfo() {
     }
