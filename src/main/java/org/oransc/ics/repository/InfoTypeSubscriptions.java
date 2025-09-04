@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,8 +86,8 @@ public class InfoTypeSubscriptions {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof SubscriptionInfo) {
-                return this.id.equals(((SubscriptionInfo) o).id);
+            if (o instanceof SubscriptionInfo subscriptionInfo) {
+                return this.id.equals(subscriptionInfo.id);
             }
             return this.id.equals(o);
         }

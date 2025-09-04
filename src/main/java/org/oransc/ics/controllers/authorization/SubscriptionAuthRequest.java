@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2022 Nordix Foundation
+ * Copyright (C) 2022-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,29 +52,29 @@ public class SubscriptionAuthRequest {
             READ, WRITE
         }
 
-        @Schema(name = "access_type", description = "Access type", required = true)
+        @Schema(name = "access_type", description = "Access type", requiredMode = Schema.RequiredMode.REQUIRED)
         @JsonProperty(value = "access_type", required = true)
         @SerializedName("access_type")
         private AccessType accessType;
 
-        @Schema(name = "info_type_id", description = "Information type identifier", required = true)
+        @Schema(name = "info_type_id", description = "Information type identifier", requiredMode = Schema.RequiredMode.REQUIRED)
         @SerializedName("info_type_id")
         @JsonProperty(value = "info_type_id", required = true)
         private String infoTypeId;
 
-        @Schema(name = "job_definition", description = "Information type specific job data", required = true)
+        @Schema(name = "job_definition", description = "Information type specific job data", requiredMode = Schema.RequiredMode.REQUIRED)
         @SerializedName("job_definition")
         @JsonProperty(value = "job_definition", required = true)
         private Object jobDefinition;
 
-        @Schema(name = "auth_token", description = "Authorization token", required = true)
+        @Schema(name = "auth_token", description = "Authorization token", requiredMode = Schema.RequiredMode.REQUIRED)
         @SerializedName("auth_token")
         @JsonProperty(value = "auth_token", required = true)
         private String authToken;
 
     }
 
-    @Schema(name = "input", description = "Input", required = true)
+    @Schema(name = "input", description = "Input", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "input", required = true)
     @SerializedName("input")
     private Input input;

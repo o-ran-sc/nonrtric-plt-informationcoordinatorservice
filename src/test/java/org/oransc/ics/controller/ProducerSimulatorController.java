@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +77,7 @@ public class ProducerSimulatorController {
         public boolean errorFound = false;
 
         public TestResults() {
+            // empty class
         }
 
         public void reset() {
@@ -89,7 +91,7 @@ public class ProducerSimulatorController {
     }
 
     @Getter
-    private TestResults testResults = new TestResults();
+    private final TestResults testResults = new TestResults();
 
     @PostMapping(path = JOB_URL, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(

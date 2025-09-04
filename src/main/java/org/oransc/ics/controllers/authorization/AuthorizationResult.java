@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2022 Nordix Foundation
+ * Copyright (C) 2022-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +32,7 @@ import lombok.Getter;
 @Builder
 public class AuthorizationResult {
 
-    @Schema(name = "result", description = "If true, the access is granted", required = true)
+    @Schema(name = "result", description = "If true, the access is granted", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty(value = "result", required = true)
     @SerializedName("result")
     @Getter

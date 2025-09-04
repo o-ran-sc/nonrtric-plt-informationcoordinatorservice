@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2021 Nordix Foundation
+ * Copyright (C) 2021-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(name = "consumer_information_type", description = "Information for an Information type")
 public class ConsumerInfoTypeInfo {
 
-    @Schema(name = "job_data_schema", description = "Json schema for the job data", required = true)
+    @Schema(name = "job_data_schema", description = "Json schema for the job data", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("job_data_schema")
     @JsonProperty(value = "job_data_schema", required = true)
     public Object jobDataSchema;
@@ -42,12 +43,12 @@ public class ConsumerInfoTypeInfo {
         + "ENABLED: one or several producers for the information type are available <br/>" //
         + "DISABLED: no producers for the information type are available";
 
-    @Schema(name = "type_status", description = STATUS_DESCRIPTION, required = true)
+    @Schema(name = "type_status", description = STATUS_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("type_status")
     @JsonProperty(value = "type_status", required = true)
     public ConsumerTypeStatusValues state;
 
-    @Schema(name = "no_of_producers", description = "The number of registered producers for the type", required = true)
+    @Schema(name = "no_of_producers", description = "The number of registered producers for the type", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("no_of_producers")
     @JsonProperty(value = "no_of_producers", required = true)
     public int noOfProducers;

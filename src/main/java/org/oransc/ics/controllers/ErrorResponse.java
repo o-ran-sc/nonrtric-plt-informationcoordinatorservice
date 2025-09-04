@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,11 +100,8 @@ public class ErrorResponse {
     public static ResponseEntity<Object> create(Throwable e, HttpStatus code) {
         if (e instanceof RuntimeException) {
             code = HttpStatus.INTERNAL_SERVER_ERROR;
-        } else if (e instanceof ServiceException) {
-            ServiceException se = (ServiceException) e;
-            if (se.getHttpStatus() != null) {
-                code = se.getHttpStatus();
-            }
+        } else if (e instanceof ServiceException se && se.getHttpStatus() != null) {
+            code = se.getHttpStatus();
         }
         return create(e.getMessage(), code);
     }

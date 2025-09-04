@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,8 +89,8 @@ public class InfoProducer {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof InfoProducer) {
-            return this.id.equals(((InfoProducer) o).id);
+        if (o instanceof InfoProducer infoProducer) {
+            return this.id.equals(infoProducer.id);
         }
         return this.id.equals(o);
     }

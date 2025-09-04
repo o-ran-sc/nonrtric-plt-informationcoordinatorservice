@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +31,7 @@ import org.oransc.ics.repository.InfoJob;
 @Schema(name = "producer_info_job_request", description = "The body of the Information Producer callbacks for Information Job creation and deletion")
 public class ProducerJobInfo {
 
-    @Schema(name = "info_job_identity", description = "Identity of the Information Job", required = true)
+    @Schema(name = "info_job_identity", description = "Identity of the Information Job", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_job_identity")
     @JsonProperty("info_job_identity")
     public String id = "";

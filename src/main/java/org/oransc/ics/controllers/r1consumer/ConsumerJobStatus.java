@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +42,12 @@ public class ConsumerJobStatus {
 
     private static final String PRODUCERS_DESCRIPTION = "An array of all registered Information Producer Identifiers.";
 
-    @Schema(name = "info_job_status", description = OPERATIONAL_STATE_DESCRIPTION, required = true)
+    @Schema(name = "info_job_status", description = OPERATIONAL_STATE_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_job_status")
     @JsonProperty(value = "info_job_status", required = true)
     public InfoJobStatusValues state;
 
-    @Schema(name = "producers", description = PRODUCERS_DESCRIPTION, required = true)
+    @Schema(name = "producers", description = PRODUCERS_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("producers")
     @JsonProperty(value = "producers", required = true)
     public Collection<String> producers;

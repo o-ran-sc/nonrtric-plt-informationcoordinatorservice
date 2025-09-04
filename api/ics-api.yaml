@@ -1625,12 +1625,12 @@ components:
         job_owner:
           type: string
           description: Identity of the owner of the job
-        job_definition:
-          type: object
-          description: Information type specific job data
         status_notification_uri:
           type: string
           description: The target of Information subscription job status notifications
+        job_definition:
+          type: object
+          description: Information type specific job data
       description: Information for an Information Job
     producer_status:
       required:

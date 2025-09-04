@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,27 +29,27 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(name = "EiJobObject", description = "Information for an Enrichment Information Job")
 public class A1eEiJobInfo {
 
-    @Schema(name = "eiTypeId", description = "EI type Idenitifier of the EI job", required = true)
+    @Schema(name = "eiTypeId", description = "EI type Idenitifier of the EI job", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("eiTypeId")
     @JsonProperty(value = "eiTypeId", required = true)
     public String eiTypeId = "";
 
-    @Schema(name = "jobOwner", description = "Identity of the owner of the job", required = true)
+    @Schema(name = "jobOwner", description = "Identity of the owner of the job", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("jobOwner")
     @JsonProperty(value = "jobOwner", required = true)
     public String owner = "";
 
-    @Schema(name = "jobDefinition", description = "EI type specific job data", required = true)
+    @Schema(name = "jobDefinition", description = "EI type specific job data", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("jobDefinition")
     @JsonProperty(value = "jobDefinition", required = true)
     public Object jobDefinition;
 
-    @Schema(name = "jobResultUri", description = "The target URI of the EI data", required = true)
+    @Schema(name = "jobResultUri", description = "The target URI of the EI data", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("jobResultUri")
     @JsonProperty(value = "jobResultUri", required = true)
     public String jobResultUri = "";
 
-    @Schema(name = "statusNotificationUri", description = "The target of EI job status notifications", required = false)
+    @Schema(name = "statusNotificationUri", description = "The target of EI job status notifications", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @SerializedName("jobStatusNotificationUri")
     @JsonProperty(value = "jobStatusNotificationUri", required = false)
     public String statusNotificationUri = "";

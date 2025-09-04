@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2021 Nordix Foundation
+ * Copyright (C) 2021-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +33,12 @@ import lombok.ToString;
 @Schema(name = "consumer_type_subscription_info", description = "Information for an information type subscription")
 public class ConsumerTypeSubscriptionInfo {
 
-    @Schema(name = "status_result_uri", description = "The target URI of the subscribed information", required = true)
+    @Schema(name = "status_result_uri", description = "The target URI of the subscribed information", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("status_result_uri")
     @JsonProperty(value = "status_result_uri", required = true)
     public String statusResultUri = "";
 
-    @Schema(name = "owner", description = "Identity of the owner of the subscription", required = true)
+    @Schema(name = "owner", description = "Identity of the owner of the subscription", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("owner")
     @JsonProperty(value = "owner", required = true)
     public String owner = "";
