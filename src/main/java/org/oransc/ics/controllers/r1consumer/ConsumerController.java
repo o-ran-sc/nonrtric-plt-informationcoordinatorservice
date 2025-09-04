@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,6 @@
 
 package org.oransc.ics.controllers.r1consumer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -34,14 +34,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
 import org.oransc.ics.controllers.authorization.AuthorizationCheck;
@@ -73,7 +70,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@SuppressWarnings("java:S3457") // No need to call "toString()" method as formatting and string ..
+@SuppressWarnings({"java:S3457", "java:S6830"}) // No need to call "toString()" method as formatting and string ..
 @RestController("Consumer API")
 @Tag(name = ConsumerConsts.CONSUMER_API_NAME, description = ConsumerConsts.CONSUMER_API_DESCRIPTION)
 @RequestMapping(path = ConsumerConsts.API_ROOT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -489,9 +486,9 @@ public class ConsumerController {
 
     private Mono<InfoJob> validatePutInfoJob(String jobId, InfoType infoType, ConsumerJobInfo jobInfo) {
         try {
-            validateJsonObjectAgainstSchema(infoType.getJobDataSchema(), jobInfo.jobDefinition);
-            validateUri(jobInfo.statusNotificationUri);
-            validateUri(jobInfo.jobResultUri);
+            this.infoJobs.validateJsonObjectAgainstSchema(infoType.getJobDataSchema(), jobInfo.jobDefinition);
+            this.infoJobs.validateUri(jobInfo.statusNotificationUri);
+            this.infoJobs.validateUri(jobInfo.jobResultUri);
 
             InfoJob existingJob = this.infoJobs.get(jobId);
             if (existingJob != null) {
@@ -504,31 +501,6 @@ public class ConsumerController {
             return Mono.just(toInfoJob(jobInfo, jobId, infoType));
         } catch (Exception e) {
             return Mono.error(e);
-        }
-    }
-
-    private void validateUri(String url) throws URISyntaxException, ServiceException {
-        if (url != null && !url.isEmpty()) {
-            URI uri = new URI(url);
-            if (!uri.isAbsolute()) {
-                throw new ServiceException("URI: " + url + " is not absolute", HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
-    private void validateJsonObjectAgainstSchema(Object schemaObj, Object object) throws ServiceException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-
-            String schemaAsString = mapper.writeValueAsString(schemaObj);
-            JSONObject schemaJSON = new JSONObject(schemaAsString);
-            var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
-
-            String objectAsString = mapper.writeValueAsString(object);
-            JSONObject json = new JSONObject(objectAsString);
-            schema.validate(json);
-        } catch (Exception e) {
-            throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 

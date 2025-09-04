@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +34,12 @@ import lombok.ToString;
 @Schema(name = "producer_registration_info", description = "Information for an Information Producer")
 public class ProducerRegistrationInfo {
 
-    @Schema(name = "supported_info_types", description = "Supported Information Type IDs", required = true)
+    @Schema(name = "supported_info_types", description = "Supported Information Type IDs", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("supported_info_types")
     @JsonProperty(value = "supported_info_types", required = true)
     public Collection<String> supportedTypeIds;
 
-    @Schema(name = "info_job_callback_url", description = "callback for Information Job", required = true)
+    @Schema(name = "info_job_callback_url", description = "callback for Information Job", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_job_callback_url")
     @JsonProperty(value = "info_job_callback_url", required = true)
     public String jobCallbackUrl = "";
@@ -46,7 +47,7 @@ public class ProducerRegistrationInfo {
     @Schema(
         name = "info_producer_supervision_callback_url",
         description = "callback for producer supervision",
-        required = true)
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_producer_supervision_callback_url")
     @JsonProperty(value = "info_producer_supervision_callback_url", required = true)
     public String producerSupervisionCallbackUrl = "";

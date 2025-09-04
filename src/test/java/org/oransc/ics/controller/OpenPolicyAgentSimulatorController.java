@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2022 Nordix Foundation
+ * Copyright (C) 2022-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +69,7 @@ public class OpenPolicyAgentSimulatorController {
             Collections.synchronizedList(new ArrayList<SubscriptionAuthRequest>());
 
         public TestResults() {
+            //empty class
         }
 
         public void reset() {

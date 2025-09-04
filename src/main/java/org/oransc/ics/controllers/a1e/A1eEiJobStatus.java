@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +38,7 @@ public class A1eEiJobStatus {
         + "ENABLED: the A1-EI producer is able to deliver EI result for the EI job <br/>" //
         + "DISABLED: the A1-EI producer is unable to deliver EI result for the EI job";
 
-    @Schema(name = "eiJobStatus", description = OPERATIONAL_STATE_DESCRIPTION, required = true)
+    @Schema(name = "eiJobStatus", description = OPERATIONAL_STATE_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("eiJobStatus")
     @JsonProperty(value = "eiJobStatus", required = true)
     public EiJobStatusValues state;

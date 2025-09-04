@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +21,14 @@
 
 package org.oransc.ics.repository;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapterFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +36,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Vector;
 
+import org.json.JSONObject;
 import org.oransc.ics.configuration.ApplicationConfig;
 import org.oransc.ics.controllers.r1producer.ProducerCallbacks;
 import org.oransc.ics.datastore.DataStore;
@@ -47,10 +52,10 @@ import reactor.core.publisher.Mono;
  * Dynamic representation of all existing Information Jobs.
  */
 public class InfoJobs {
-    private Map<String, InfoJob> allEiJobs = new HashMap<>();
+    private final Map<String, InfoJob> allEiJobs = new HashMap<>();
 
-    private MultiMap<String, InfoJob> jobsByType = new MultiMap<>();
-    private MultiMap<String, InfoJob> jobsByOwner = new MultiMap<>();
+    private final MultiMap<String, InfoJob> jobsByType = new MultiMap<>();
+    private final MultiMap<String, InfoJob> jobsByOwner = new MultiMap<>();
     private final Gson gson;
     private final InfoTypes infoTypes;
 
@@ -174,6 +179,31 @@ public class InfoJobs {
         jobsByOwner.clear();
 
         dataStore.deleteAllData().flatMap(s -> dataStore.createDataStore()).blockLast();
+    }
+
+    public void validateUri(String url) throws URISyntaxException, ServiceException {
+        if (url != null && !url.isEmpty()) {
+            URI uri = new URI(url);
+            if (!uri.isAbsolute()) {
+                throw new ServiceException("URI: " + url + " is not absolute", HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
+    public void validateJsonObjectAgainstSchema(Object schemaObj, Object object) throws ServiceException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            String schemaAsString = mapper.writeValueAsString(schemaObj);
+            JSONObject schemaJSON = new JSONObject(schemaAsString);
+            var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
+
+            String objectAsString = mapper.writeValueAsString(object);
+            JSONObject json = new JSONObject(objectAsString);
+            schema.validate(json);
+        } catch (Exception e) {
+            throw new ServiceException("Json validation failure " + e, HttpStatus.BAD_REQUEST);
+        }
     }
 
     private void doPut(InfoJob job) {

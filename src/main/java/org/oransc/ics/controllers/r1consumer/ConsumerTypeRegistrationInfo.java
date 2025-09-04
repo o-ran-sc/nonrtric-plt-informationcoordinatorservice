@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2021 Nordix Foundation
+ * Copyright (C) 2021-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +29,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(name = "consumer_type_registration_info", description = "Information for an Information type")
 public class ConsumerTypeRegistrationInfo {
 
-    @Schema(name = "info_type_id", description = "Information type identifier", required = true)
+    @Schema(name = "info_type_id", description = "Information type identifier", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_type_id")
     @JsonProperty(value = "info_type_id", required = true)
     public String infoTypeId;
 
-    @Schema(name = "job_data_schema", description = "Json schema for the job data", required = true)
+    @Schema(name = "job_data_schema", description = "Json schema for the job data", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("job_data_schema")
     @JsonProperty(value = "job_data_schema", required = true)
     public Object jobDataSchema;
@@ -47,7 +48,7 @@ public class ConsumerTypeRegistrationInfo {
         + "REGISTERED: the information type has been registered <br/>" //
         + "DEREGISTERED: the information type has been removed";
 
-    @Schema(name = "status", description = REGISTRATION_DESCRIPTION, required = true)
+    @Schema(name = "status", description = REGISTRATION_DESCRIPTION, requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("status")
     @JsonProperty(value = "status", required = true)
     public ConsumerTypeStatusValues state;

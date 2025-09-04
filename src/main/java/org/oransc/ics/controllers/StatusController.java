@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +31,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import lombok.RequiredArgsConstructor;
 import org.oransc.ics.repository.InfoJobs;
 import org.oransc.ics.repository.InfoProducers;
 import org.oransc.ics.repository.InfoTypes;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,21 +42,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+@SuppressWarnings("java:S6830")
 @RestController("StatusController")
 @Tag(name = StatusController.API_NAME, description = StatusController.API_DESCRIPTION)
+@RequiredArgsConstructor
 public class StatusController {
 
     public static final String API_NAME = "Service status";
     public static final String API_DESCRIPTION = "API for monitoring of the service";
 
-    @Autowired
-    private InfoJobs infoJobs;
+    private final InfoJobs infoJobs;
 
-    @Autowired
-    private InfoTypes infoTypes;
+    private final InfoTypes infoTypes;
 
-    @Autowired
-    private InfoProducers infoProducers;
+    private final InfoProducers infoProducers;
 
     @Schema(name = "service_status_info")
     public static class StatusInfo {

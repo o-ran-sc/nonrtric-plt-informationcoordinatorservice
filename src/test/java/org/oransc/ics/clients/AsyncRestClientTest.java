@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +85,7 @@ class AsyncRestClientTest {
 
         Mono<String> returnedMono = clientUnderTest.get(REQUEST_URL);
         StepVerifier.create(returnedMono)
-            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException).verify();
+            .expectErrorMatches(WebClientResponseException.class::isInstance).verify();
     }
 
     @Test
@@ -103,7 +104,7 @@ class AsyncRestClientTest {
 
         Mono<String> returnedMono = clientUnderTest.put(REQUEST_URL, TEST_JSON);
         StepVerifier.create(returnedMono)
-            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException).verify();
+            .expectErrorMatches(WebClientResponseException.class::isInstance).verify();
     }
 
     @Test
@@ -120,7 +121,7 @@ class AsyncRestClientTest {
 
         Mono<String> returnedMono = clientUnderTest.delete(REQUEST_URL);
         StepVerifier.create(returnedMono)
-            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException).verify();
+            .expectErrorMatches(WebClientResponseException.class::isInstance).verify();
     }
 
     @Test
@@ -139,7 +140,7 @@ class AsyncRestClientTest {
 
         Mono<String> returnedMono = clientUnderTest.post(REQUEST_URL, TEST_JSON);
         StepVerifier.create(returnedMono)
-            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException).verify();
+            .expectErrorMatches(WebClientResponseException.class::isInstance).verify();
     }
 
     @Test
@@ -158,6 +159,6 @@ class AsyncRestClientTest {
 
         Mono<String> returnedMono = clientUnderTest.postWithAuthHeader(REQUEST_URL, TEST_JSON, USERNAME, PASSWORD);
         StepVerifier.create(returnedMono)
-            .expectErrorMatches(throwable -> throwable instanceof WebClientResponseException).verify();
+            .expectErrorMatches(WebClientResponseException.class::isInstance).verify();
     }
 }

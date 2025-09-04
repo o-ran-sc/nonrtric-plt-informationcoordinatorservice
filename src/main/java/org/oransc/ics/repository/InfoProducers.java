@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2019 Nordix Foundation
+ * Copyright (C) 2019-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +55,7 @@ public class InfoProducers {
         this.infoTypes = infoTypes;
     }
 
-    public InfoProducer registerProducer(InfoProducerRegistrationInfo producerInfo) {
+    public void registerProducer(InfoProducerRegistrationInfo producerInfo) {
         final String producerId = producerInfo.getId();
         InfoProducer previousDefinition = this.get(producerId);
 
@@ -71,7 +72,6 @@ public class InfoProducers {
             .flatMapMany(list -> consumerCallbacks.notifyJobStatus(previousTypes, this)) //
             .subscribe();
 
-        return producer;
     }
 
     private InfoProducer createProducer(InfoProducerRegistrationInfo producerInfo) {

@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(name = "producer_info_type_info", description = "Information for an Information Type")
 public class ProducerInfoTypeInfo {
 
-    @Schema(name = "info_job_data_schema", description = "Json schema for the job data", required = true)
+    @Schema(name = "info_job_data_schema", description = "Json schema for the job data", requiredMode = Schema.RequiredMode.REQUIRED)
     @SerializedName("info_job_data_schema")
     @JsonProperty(value = "info_job_data_schema", required = true)
     public Object jobDataSchema;
@@ -36,7 +37,7 @@ public class ProducerInfoTypeInfo {
     @Schema(
         name = "info_type_information",
         description = "Type specific information for the information type",
-        required = false)
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED)
     @SerializedName("info_type_information")
     @JsonProperty(value = "info_type_information", required = false)
     public Object typeSpecificInformation;

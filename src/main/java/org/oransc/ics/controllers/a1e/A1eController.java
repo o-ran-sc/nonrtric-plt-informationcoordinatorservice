@@ -2,7 +2,8 @@
  * ========================LICENSE_START=================================
  * O-RAN-SC
  * %%
- * Copyright (C) 2020 Nordix Foundation
+ * Copyright (C) 2020-2023 Nordix Foundation
+ * Copyright (C) 2023-2025 OpenInfra Foundation Europe
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +21,6 @@
 
 package org.oransc.ics.controllers.a1e;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -34,14 +34,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
-import org.oransc.ics.configuration.ApplicationConfig;
+import lombok.RequiredArgsConstructor;
 import org.oransc.ics.controllers.ErrorResponse;
 import org.oransc.ics.controllers.VoidResponse;
 import org.oransc.ics.controllers.authorization.AuthorizationCheck;
@@ -55,7 +52,6 @@ import org.oransc.ics.repository.InfoType;
 import org.oransc.ics.repository.InfoTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,33 +66,26 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-@SuppressWarnings("java:S3457") // No need to call "toString()" method as formatting and string ..
+@SuppressWarnings({"java:S3457", "java:S6830"}) // No need to call "toString()" method as formatting and string ..
 @RestController("A1-EI")
 @Tag(name = A1eConsts.CONSUMER_API_NAME, description = A1eConsts.CONSUMER_API_DESCRIPTION)
 @RequestMapping(path = A1eConsts.API_ROOT, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
 public class A1eController {
 
     private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    ApplicationConfig applicationConfig;
+    private final InfoJobs infoJobs;
 
-    @Autowired
-    private InfoJobs infoJobs;
+    private final InfoTypes infoTypes;
 
-    @Autowired
-    private InfoTypes infoTypes;
+    private final InfoProducers infoProducers;
 
-    @Autowired
-    private InfoProducers infoProducers;
+    private final ProducerCallbacks producerCallbacks;
 
-    @Autowired
-    ProducerCallbacks producerCallbacks;
+    private final AuthorizationCheck authorization;
 
-    @Autowired
-    private AuthorizationCheck authorization;
-
-    private static Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private static final Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
     @GetMapping(path = "/eitypes", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "EI type identifiers", description = "")
@@ -293,7 +282,7 @@ public class A1eController {
     public Mono<ResponseEntity<Object>> putIndividualEiJob( //
         @PathVariable("eiJobId") String eiJobId, //
         @RequestBody A1eEiJobInfo eiJobObject, //
-        @RequestHeader Map<String, String> headers) throws ServiceException {
+        @RequestHeader Map<String, String> headers) {
 
         final boolean isNewJob = this.infoJobs.get(eiJobId) == null;
         try {
@@ -302,7 +291,7 @@ public class A1eController {
             return authorization.doAccessControl(headers, eiType, eiJobObject.jobDefinition, AccessType.WRITE) //
                 .flatMap(x -> validatePutEiJob(eiJobId, eiType, eiJobObject)) //
                 .flatMap(job -> startEiJob(job, eiType)) //
-                .doOnNext(newEiJob -> this.infoJobs.put(newEiJob)) //
+                .doOnNext(this.infoJobs::put) //
                 .map(newEiJob -> new ResponseEntity<>(isNewJob ? HttpStatus.CREATED : HttpStatus.OK)) //
                 .onErrorResume(
                     throwable -> Mono.just(ErrorResponse.create(throwable, HttpStatus.INTERNAL_SERVER_ERROR)));
@@ -320,9 +309,9 @@ public class A1eController {
 
     private Mono<InfoJob> validatePutEiJob(String eiJobId, InfoType eiType, A1eEiJobInfo eiJobInfo) {
         try {
-            validateJsonObjectAgainstSchema(eiType.getJobDataSchema(), eiJobInfo.jobDefinition);
-            validateUri(eiJobInfo.jobResultUri);
-            validateUri(eiJobInfo.statusNotificationUri);
+            this.infoJobs.validateJsonObjectAgainstSchema(eiType.getJobDataSchema(), eiJobInfo.jobDefinition);
+            this.infoJobs.validateUri(eiJobInfo.jobResultUri);
+            this.infoJobs.validateUri(eiJobInfo.statusNotificationUri);
 
             InfoJob existingEiJob = this.infoJobs.get(eiJobId);
             if (existingEiJob != null) {
@@ -334,31 +323,6 @@ public class A1eController {
             return Mono.just(toEiJob(eiJobInfo, eiJobId, eiType));
         } catch (Exception e) {
             return Mono.error(e);
-        }
-    }
-
-    private void validateUri(String url) throws URISyntaxException, ServiceException {
-        if (url != null && !url.isEmpty()) {
-            URI uri = new URI(url);
-            if (!uri.isAbsolute()) {
-                throw new ServiceException("URI: " + url + " is not absolute", HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
-    private void validateJsonObjectAgainstSchema(Object schemaObj, Object object) throws ServiceException {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-
-            String schemaAsString = mapper.writeValueAsString(schemaObj);
-            JSONObject schemaJSON = new JSONObject(schemaAsString);
-            var schema = org.everit.json.schema.loader.SchemaLoader.load(schemaJSON);
-
-            String objectAsString = mapper.writeValueAsString(object);
-            JSONObject json = new JSONObject(objectAsString);
-            schema.validate(json);
-        } catch (Exception e) {
-            throw new ServiceException("Json validation failure " + e.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
