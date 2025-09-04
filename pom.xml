@@ -3,7 +3,12 @@
 * ========================LICENSE_START=================================
 * O-RAN-SC
 * %%
+<<<<<<< HEAD   (18e4a6 Release notes & Roll version after i-release 1.6.0 -> 1.6.1)
 * Copyright (C) 2019 Nordix Foundation
+=======
+* Copyright (C) 2019-2023 Nordix Foundation. All rights reserved.
+* Copyright (C) 2023-2025 OpenInfra Foundation Europe. All rights reserved.
+>>>>>>> CHANGE (b9ee6c Spring Boot version upgraded to 3.5.5)
 * %%
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,7 +31,11 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
+<<<<<<< HEAD   (18e4a6 Release notes & Roll version after i-release 1.6.0 -> 1.6.1)
         <version>3.0.4</version>
+=======
+        <version>3.5.5</version>
+>>>>>>> CHANGE (b9ee6c Spring Boot version upgraded to 3.5.5)
         <relativePath />
     </parent>
     <groupId>org.o-ran-sc.nonrtric.plt</groupId>
@@ -58,6 +67,7 @@
         <jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
         <springdoc.version>2.0.2</springdoc.version>
         <springdoc.openapi-ui.version>1.6.14</springdoc.openapi-ui.version>
+        <mockwebserver.version>5.1.0</mockwebserver.version>
         <exec.skip>true</exec.skip>
     </properties>
     <dependencies>
@@ -163,6 +173,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
+            <version>${mockwebserver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
