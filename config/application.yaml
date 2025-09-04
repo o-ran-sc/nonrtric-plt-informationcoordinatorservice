@@ -1,5 +1,6 @@
 #  ============LICENSE_START===============================================
-#  Copyright (C) 2019-2022 Nordix Foundation. All rights reserved.
+#  Copyright (C) 2019-2023 Nordix Foundation. All rights reserved.
+#  Copyright (C) 2023-2025 OpenInfra Foundation Europe
 #  ========================================================================
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -33,12 +34,14 @@ management:
   endpoint:
     shutdown:
       enabled: true
+    heapdump:
+      enabled: true
 lifecycle:
   timeout-per-shutdown-phase: "20s"
 logging:
   # Configuration of logging
   level:
-    ROOT: ERROR
+    ROOT: INFO
     org.springframework: ERROR
     org.springframework.data: ERROR
     org.springframework.web.reactive.function.client.ExchangeFunctions: ERROR
