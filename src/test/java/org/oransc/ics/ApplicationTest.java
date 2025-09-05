@@ -113,6 +113,7 @@ import reactor.test.StepVerifier;
         "app.webclient.trust-store=./config/truststore.jks", //
         "app.webclient.trust-store-used=true", //
         "app.vardata-directory=/tmp/ics", //
+        "logging.file.name=/tmp/ics.log",
         "app.s3.bucket=" // If this is set, S3 will be used to store data.
     })
 class ApplicationTest {
