@@ -8,7 +8,7 @@
 
 ## Overview
 
-The Information Coordination Service (ICS) is a generic service designed to manage data subscriptions in a multi-vendor environment. It facilitates decoupling between data consumers and producers, allowing seamless interaction without consumers needing knowledge of specific producers.
+The Information Coordination Service (ICS) is a generic service designed to manage data subscriptions in a multi-vendor environment. It facilitates decoupling between data consumers and producers, allowing seamless interaction without consumers needing knowledge of specific producers. 
 
 ## Key Concepts
 
