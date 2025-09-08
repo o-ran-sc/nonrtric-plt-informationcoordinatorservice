@@ -1,5 +1,5 @@
 ---
 distribution_type: maven
-version: 1.5.0
+version: 1.6.1
 project: informationcoordinatorservice
-log_dir: nonrtric-plt-informationcoordinatorservice-maven-stage-master/377/
+log_dir: nonrtric-plt-informationcoordinatorservice-maven-stage-i-release/1/
