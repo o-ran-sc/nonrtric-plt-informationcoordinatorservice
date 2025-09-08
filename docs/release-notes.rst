@@ -1,7 +1,7 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
-.. Copyright (C) 2021 Nordix. All rights reserved
-.. Copyright (C) 2021 OpenInfra Foundation Europe. All rights reserved
+.. Copyright (C) 2021-2023 Nordix. All rights reserved
+.. Copyright (C) 2023-2025 OpenInfra Foundation Europe. All rights reserved
 
 =============
 Release-Notes
@@ -49,6 +49,9 @@ Version history Information Coordinator Service
 |            |          |                  |                    |
 +------------+----------+------------------+--------------------+
 | 2023-12-14 | 1.6.0    | John Keeney      | I Release          |
+|            |          |                  |                    |
++------------+----------+------------------+--------------------+
+| 2025-09-08 | 1.6.1    | John Keeney      | I Release - Update |
 |            |          |                  |                    |
 +------------+----------+------------------+--------------------+
 
@@ -271,5 +274,27 @@ I Release
 +-----------------------------+---------------------------------------------------+
 | **Purpose of the delivery** | nonrtric-plt-informationcoordinatorservice:1.6.0  |
 |                             |    Minor improvements and stability updates       |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+
+I Release - Update
+------------------
++-----------------------------+---------------------------------------------------+
+| **Project**                 | Non-RT RIC Information Coordinator Service        |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Repo/commit-ID**          | nonrtric/plt/informationcoordinatorservice/       |
+|                             | ec80c2ed579ae34361bc1f8cf54dd18cb3bb3b2b          |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Release designation**     | I                                                 |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Release date**            | 2025-09-08                                        |
+|                             |                                                   |
++-----------------------------+---------------------------------------------------+
+| **Purpose of the delivery** | nonrtric-plt-informationcoordinatorservice:1.6.1  |
+|                             |    Minor updates to 3PPs. Improved logging.       |
+|                             |    Permission error in Dockerfile                 |
 |                             |                                                   |
 +-----------------------------+---------------------------------------------------+
