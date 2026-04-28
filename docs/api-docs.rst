@@ -20,7 +20,7 @@ Here we describe the API to access the Non-RT RIC Information Coordination Servi
 Information Coordinator Service
 ===============================
 
-See `A1 Information Information Coordination Service API <./ics-api.html>`_ for full details of the API.
+See :doc:`ics-api` for full details of the API.
 
 The API is also described in Swagger-JSON and YAML:
 
