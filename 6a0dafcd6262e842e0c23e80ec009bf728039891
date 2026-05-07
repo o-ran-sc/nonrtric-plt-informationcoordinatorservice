@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "6a0dafcd6262e842e0c23e80ec009bf728039891",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f480f064_bd52b667",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000103
+      },
+      "writtenOn": "2026-05-07T14:51:52Z",
+      "side": 1,
+      "message": "ORAN Required GHA vote needs to be overridden, or change merged with child review https://gerrit.o-ran-sc.org/r/c/nonrtric/plt/informationcoordinatorservice/+/15633/1",
+      "revId": "6a0dafcd6262e842e0c23e80ec009bf728039891",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
