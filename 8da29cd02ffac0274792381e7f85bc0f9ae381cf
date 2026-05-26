@@ -16,6 +16,24 @@
       "message": "Is an update needed in .readthedocs.yaml?",
       "revId": "8da29cd02ffac0274792381e7f85bc0f9ae381cf",
       "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de2f7de5_fc06063a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1002638
+      },
+      "writtenOn": "2026-05-26T13:09:50Z",
+      "side": 1,
+      "message": "Don\u0027t think so. All I am doing is swapping an externally managed extension for our own one. It is picked up ok by the build",
+      "parentUuid": "58608847_fecaccf8",
+      "revId": "8da29cd02ffac0274792381e7f85bc0f9ae381cf",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
     }
   ]
 }
