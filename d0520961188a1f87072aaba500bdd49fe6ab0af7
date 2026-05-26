@@ -1,0 +1,9 @@
+Verified+1: ORAN Jobbuilder <releng+oran-jobbuilder@linuxfoundation.org>
+Verified+1: ORAN Required GHA <releng+oran.required.gha@linuxfoundation.org>
+Code-Review+2: John Keeney <john.keeney@est.tech>
+Submitted-by: John Keeney <john.keeney@est.tech>
+Submitted-at: Tue, 26 May 2026 10:03:29 +0000
+Reviewed-on: https://gerrit.o-ran-sc.org/r/c/nonrtric/plt/informationcoordinatorservice/+/15633
+Comments-Total: 1
+Project: nonrtric/plt/informationcoordinatorservice
+Branch: refs/heads/master
