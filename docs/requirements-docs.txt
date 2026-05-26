@@ -1,5 +1,9 @@
 sphinx>=7,<10
 sphinx-rtd-theme
 sphinxcontrib-httpdomain
+<<<<<<< PATCH SET (fd781d Replace sphinxcontrib-redoc with local redoc_gen extension)
+lfdocs-conf
+=======
 lfdocs-conf
 sphinxcontrib-openapi
+>>>>>>> BASE      (9389f4 Refactor(docs): migrate API rendering from redoc to openapi)

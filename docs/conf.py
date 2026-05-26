@@ -17,6 +17,11 @@
 
 from docs_conf.conf import *
 
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '_extensions'))
+
 #branch configuration
 
 branch = 'latest'
@@ -27,8 +32,21 @@ linkcheck_ignore = [
     'https://gerrit.o-ran-sc.org.*',
 ]
 
+<<<<<<< PATCH SET (fd781d Replace sphinxcontrib-redoc with local redoc_gen extension)
+extensions = ['sphinx.ext.intersphinx', 'redoc_gen']
+=======
 extensions = ['sphinxcontrib.openapi', 'sphinx.ext.intersphinx']
+>>>>>>> BASE      (9389f4 Refactor(docs): migrate API rendering from redoc to openapi)
 
+<<<<<<< PATCH SET (fd781d Replace sphinxcontrib-redoc with local redoc_gen extension)
+redoc_pages = [
+            {
+                'title': 'ICS API',
+                'page': 'ics-api',
+                'spec': os.path.join(os.path.dirname(__file__), '..', 'api', 'ics-api.json'),
+            }
+        ]
+=======
 # sphinxcontrib-openapi synthesises HTTP request/response examples
 # whose bodies (e.g. enum literal values, free-form 'string'
 # placeholders) Pygments' http lexer rejects. The extension already
@@ -36,6 +54,7 @@ extensions = ['sphinxcontrib.openapi', 'sphinx.ext.intersphinx']
 # errors under sphinx-build -W. Suppress them since the rendered
 # output is correct.
 suppress_warnings = ['misc.highlighting_failure']
+>>>>>>> BASE      (9389f4 Refactor(docs): migrate API rendering from redoc to openapi)
 #intershpinx mapping with other projects
 intersphinx_mapping = {}
 
