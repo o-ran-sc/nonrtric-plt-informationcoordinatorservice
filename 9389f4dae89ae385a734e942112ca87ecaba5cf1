@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "610419da_3e7b8148",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000103
+      },
+      "writtenOn": "2026-05-26T11:21:37Z",
+      "side": 1,
+      "message": "Update coming very soon after this one to address a couple of issues.",
+      "revId": "9389f4dae89ae385a734e942112ca87ecaba5cf1",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
