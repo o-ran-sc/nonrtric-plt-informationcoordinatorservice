@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58608847_fecaccf8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1000103
+      },
+      "writtenOn": "2026-05-26T11:33:03Z",
+      "side": 1,
+      "message": "Is an update needed in .readthedocs.yaml?",
+      "revId": "8da29cd02ffac0274792381e7f85bc0f9ae381cf",
+      "serverId": "84e4e190-e623-4c37-9eda-58b1937c1b53"
+    }
+  ]
+}
