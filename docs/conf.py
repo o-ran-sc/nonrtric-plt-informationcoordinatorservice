@@ -17,6 +17,11 @@
 
 from docs_conf.conf import *
 
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '_extensions'))
+
 #branch configuration
 
 branch = 'latest'
@@ -25,17 +30,18 @@ linkcheck_ignore = [
     'http://localhost.*',
     'http://127.0.0.1.*',
     'https://gerrit.o-ran-sc.org.*',
+    './ics-api.html', #Generated file that doesn't exist at link check.
 ]
 
-extensions = ['sphinxcontrib.openapi', 'sphinx.ext.intersphinx']
+extensions = ['sphinx.ext.intersphinx', 'redoc_gen']
 
-# sphinxcontrib-openapi synthesises HTTP request/response examples
-# whose bodies (e.g. enum literal values, free-form 'string'
-# placeholders) Pygments' http lexer rejects. The extension already
-# falls back to relaxed-mode lexing, but the warnings are promoted to
-# errors under sphinx-build -W. Suppress them since the rendered
-# output is correct.
-suppress_warnings = ['misc.highlighting_failure']
+redoc_pages = [
+            {
+                'title': 'ICS API',
+                'page': 'ics-api',
+                'spec': os.path.join(os.path.dirname(__file__), '..', 'api', 'ics-api.json'),
+            }
+        ]
 #intershpinx mapping with other projects
 intersphinx_mapping = {}
 

@@ -8,6 +8,4 @@
 This page renders the OpenAPI specification for the ICS API
 directly inline.
 
-.. openapi:: ../api/ics-api.json
-   :examples:
-   :group:
+`View ICS API Documentation <./ics-api.html>`_
