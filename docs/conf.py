@@ -17,6 +17,11 @@
 
 from docs_conf.conf import *
 
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '_extensions'))
+
 #branch configuration
 
 branch = 'latest'
@@ -28,19 +33,15 @@ linkcheck_ignore = [
     './ics-api.html', #Generated file that doesn't exist at link check.
 ]
 
-extensions = ['sphinxcontrib.redoc', 'sphinx.ext.intersphinx',]
+extensions = ['sphinx.ext.intersphinx', 'redoc_gen']
 
-redoc = [
+redoc_pages = [
             {
-                'name': 'ICS API',
+                'title': 'ICS API',
                 'page': 'ics-api',
-                'spec': '../api/ics-api.json',
-                'embed': True,
+                'spec': os.path.join(os.path.dirname(__file__), '..', 'api', 'ics-api.json'),
             }
         ]
-
-redoc_uri = 'https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js'
-
 #intershpinx mapping with other projects
 intersphinx_mapping = {}
 

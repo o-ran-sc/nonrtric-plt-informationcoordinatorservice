@@ -21,3 +21,5 @@ infer-out/
 .factorypath
 
 coverage.*
+
+__pycache__/
